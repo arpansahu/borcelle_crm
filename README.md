@@ -172,7 +172,7 @@ RabbitMQ is an open-source message-broker software that originally implemented t
 Available at: https://crm-borcelle.herokuapp.com/
 
 admin login details:--
-username: arpansahu
+username: admin@arpansahu.me
 password: showmecode
 ## License
 
