@@ -22,13 +22,12 @@ from send_email_app.views import (
     WebSocketSendMail,
 )
 
-
 from account.views import (
     CustomPasswordResetView,
-    registration_view,
+    RegistrationView,
     LogoutView,
     LoginView,
-    AccountView,
+    AccountView, activate,
 )
 
 from manager.views import (
@@ -58,11 +57,12 @@ urlpatterns = [
     path('search-user-name/', search_name, name='search-user-name'),
     path('search-country-code/', search_country_code, name='search-country-code'),
 
-    path('register/', registration_view, name='register'),
+    path('register/', RegistrationView.as_view(), name='register'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('login/', LoginView.as_view(), name='login'),
     path('account/', AccountView.as_view(), name='account'),
-
+    path('activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
+         activate, name='account_activate'),
     path('password_change/done/',
          auth_views.PasswordChangeDoneView.as_view(template_name='registration/password_change_done.html'),
          name='password_change_done'),
@@ -84,3 +84,8 @@ urlpatterns = [
          auth_views.PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'),
          name='password_reset_complete'),
 ]
+
+handler404 = 'borcelle_crm.views.handler404'
+handler500 = 'borcelle_crm.views.handler500'
+handler403 = 'borcelle_crm.views.handler404'
+handler400 = 'borcelle_crm.views.handler500'

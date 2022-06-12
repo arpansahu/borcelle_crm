@@ -1,17 +1,33 @@
+import ssl
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate, logout, get_user_model
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import FormView, RedirectView
 from django.utils.translation import gettext_lazy as _
 
 from account.forms import RegistrationForm, AccountAuthenticationForm, AccountUpdateForm, PasswordResetForm, LoginForm
-
+from django.conf import settings
 from django.contrib.auth.views import PasswordContextMixin
+
+from account.models import Account
+from account.token import account_activation_token
+
+DOMAIN = settings.DOMAIN
+PROTOCOL = settings.PROTOCOL
+
+from mailjet_rest import Client
+
+mailjet = Client(auth=(settings.MAIL_JET_API_KEY, settings.MAIL_JET_API_SECRET), version='v3.1')
 
 
 # Create your views here.
@@ -47,24 +63,75 @@ class CustomPasswordResetView(PasswordContextMixin, FormView):
         return super().form_valid(form)
 
 
-def registration_view(request):
-    context = {}
-    if request.POST:
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            email = form.cleaned_data.get('email')
-            raw_password = form.cleaned_data.get('password1')
-            account = authenticate(email=email, password=raw_password)
-            login(request, account)
-            return redirect('login')
-        else:
-            context['registration_form'] = form
+def send_mail_account_activate(reciever_email, user, SUBJECT="Confirm Your Email"):
+    message = render_to_string(template_name='account/activate_account_mail.html', context={
+        'user': user,
+        'protocol': PROTOCOL,
+        'domain': DOMAIN,
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': account_activation_token.make_token(user),
+    })
 
+    data = {
+        'Messages': [
+            {
+                "From": {
+                    "Email": "admin@arpansahu.me",
+                    "Name": "Borcelle CRM"
+                },
+                "To": [
+                    {
+                        "Email": reciever_email,
+                        "Name": "Dear User"
+                    }
+                ],
+                "Subject": SUBJECT,
+                "TextPart": message,
+                "HTMLPart": f"<h3>Dear {user.username}, Message: {message}",
+                "CustomID": f"{reciever_email}"
+            }
+        ]
+    }
+    result = mailjet.send.create(data=data)
+    print("account activation mail send")
+    return result
+
+
+def activate(request, uidb64, token):
+    User = get_user_model()
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        return render(request, 'account/account_activation_done.html', context={'message': 'Thank you for your email '
+                                                                                           'confirmation. Now you can '
+                                                                                           'login your account.'})
     else:
+        return render(request, 'account/account_activation_done.html', context={'message': 'Activation link is invalid!'})
+
+
+class RegistrationView(View):
+    def get(self, request, *args, **kwargs):
+        context = {}
         form = RegistrationForm()
         context['registration_form'] = form
-    return render(request, 'account/register.html', context)
+        return render(request, 'account/register.html', context)
+
+    def post(self, request, *args, **kwargs):
+        context = {}
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            account = form.save()
+            email = form.cleaned_data.get('email')
+            send_mail_account_activate(email, account)
+            return render(request, 'account/account_activation_done.html', {'message': 'Check your mail and activate your account'})
+        else:
+            context['registration_form'] = form
+        return render(request, 'account/register.html', context)
 
 
 @method_decorator(login_required(redirect_field_name=''), name='dispatch')

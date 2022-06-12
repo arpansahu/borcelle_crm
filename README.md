@@ -9,6 +9,7 @@ This project provides following features
 2. You can do CRUD operation with your contacts
 3. Message your contacts via portal which will be emailed to them to their email.
 4. Check history of messages
+5. Email Verification before user can login
 
 
 -Implemented Celery and Redis to Take Notes and Email it.

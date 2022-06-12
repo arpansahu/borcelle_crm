@@ -25,7 +25,7 @@ def send_mail_task_with_schedule(self, emails, headline, content, message):
                 {
                     "From": {
                         "Email": "admin@arpansahu.me",
-                        "Name": "Clock Works"
+                        "Name": "Borcelle CRM"
                     },
                     "To": [
                         {
@@ -65,7 +65,7 @@ def web_socket_send_mail_task(self, emails, headline, content, message):
                 {
                     "From": {
                         "Email": "admin@arpansahu.me",
-                        "Name": "Clock Works"
+                        "Name": "Borcelle CRM"
                     },
                     "To": [
                         {
