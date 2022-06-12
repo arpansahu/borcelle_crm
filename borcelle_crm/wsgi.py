@@ -1,5 +1,5 @@
 """
-WSGI config for clock_work project.
+WSGI config for borcelle_crm project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'clock_work.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'borcelle_crm.settings')
 
 application = get_wsgi_application()

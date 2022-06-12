@@ -27,7 +27,7 @@ This project provides following features
 ## What is Redis, Celery, Celery Beat, Web Sockets, Channels, Signals, Ajax and working ?
 In the below image I will try to explain everything.
 
-![alt text](https://github.com/arpansahu/clock_work/blob/master/explanation.png?raw=true)
+![alt text](https://github.com/arpansahu/borcelle_crm/blob/master/explanation.png?raw=true)
 
 ## Working:-
 
@@ -87,7 +87,7 @@ Working:
 1. Celery requires message broker to store messages received from task generators or producers. For reading information of messages in task
   serialization is required which can be in json/pickle/yaml/msgpack it can be in compressed form as zlib, bzip2 or a cryptographic message.
 2. A celery system consists of multiple workers and brokers, giving way to high availability and horizontal scaling.
-3. When a celery worker is started using command ```celery -A [clock_work(project name)].celery worker -l info```, a supervisor is started.
+3. When a celery worker is started using command ```celery -A [borcelle_crm(project name)].celery worker -l info```, a supervisor is started.
 4. Which spawns child processes or threads and deals with all the bookkeeping stuff. The child processes or threads execute the actual task.
   This child process are also known as execution pool. By default, no of child process worker can spawn is equal to the no of CPU cores.
 5. The size of execution pool determines the number of tasks your celery worker can process
@@ -236,11 +236,11 @@ from celery.schedules import crontab
 from decouple import config
 
 # set the default Django settings module for the 'celery' program.
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'clock_work.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'borcelle_crm.settings')
 
 redis_url = config("REDISCLOUD_URL")
 
-app = Celery('clock_work', broker=redis_url, backend=redis_url, include=['tasks.tasks'])
+app = Celery('borcelle_crm', broker=redis_url, backend=redis_url, include=['tasks.tasks'])
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
@@ -268,7 +268,7 @@ def debug_task(self):
 
 set ASGI settings in settings.py
 ``` 
-ASGI_APPLICATION = 'clock_work.routing.application'
+ASGI_APPLICATION = 'borcelle_crm.routing.application'
 ```
 
 Uncomment Channel Layers Setting for Local Machine on settings.py
@@ -349,10 +349,10 @@ MIDDLEWARE = [
 Create Procfile and include this code snippet in it.
 ```
 release: python manage.py migrate
-web: daphne clock_work.asgi:application --port $PORT --bind 0.0.0.0 -v2
-celery: celery -A clock_work.celery worker -l info
-celerybeat: celery -A clock_work beat -l INFO
-celeryworker2: celery -A clock_work.celery worker & celery -A clock_work beat -l INFO & wait -n
+web: daphne borcelle_crm.asgi:application --port $PORT --bind 0.0.0.0 -v2
+celery: celery -A borcelle_crm.celery worker -l info
+celerybeat: celery -A borcelle_crm beat -l INFO
+celeryworker2: celery -A borcelle_crm.celery worker & celery -A borcelle_crm beat -l INFO & wait -n
 ```
 
 In the above Procfile there are three workers required for web, celery and celery beat, but since heroku free

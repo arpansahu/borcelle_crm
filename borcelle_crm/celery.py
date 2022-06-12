@@ -5,11 +5,11 @@ from celery.schedules import crontab
 from decouple import config
 
 # set the default Django settings module for the 'celery' program.
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'clock_work.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'borcelle_crm.settings')
 
 redis_url = config("REDISCLOUD_URL")
 
-app = Celery('clock_work', broker=redis_url, backend=redis_url, include=['tasks.tasks'])
+app = Celery('borcelle_crm', broker=redis_url, backend=redis_url, include=['tasks.tasks'])
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
