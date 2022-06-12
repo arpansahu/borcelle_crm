@@ -1,0 +1,3 @@
+celery -A clock_work.celery worker -l info
+celery -A clock_work beat -l INFO
+Bets Practices of Celery https://betterprogramming.pub/python-celery-best-practices-ae182730bb81
