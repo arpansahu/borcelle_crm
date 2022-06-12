@@ -148,12 +148,42 @@ LOGIN_REDIRECT_URL = "/"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
+if not DEBUG:
+    AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400'
+    }
+    AWS_LOCATION = 'static'
+    AWS_QUERYSTRING_AUTH = False
+    AWS_HEADERS = {
+        'Access-Control-Allow-Origin': '*',
+    }
+    # s3 static settings
+    AWS_STATIC_LOCATION = 'portfolio/borcelle_crm/static'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
+    STATICFILES_STORAGE = 'borcelle_crm.storage_backends.StaticStorage'
+    # s3 public media settings
+    AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/borcelle_crm/media'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
+    DEFAULT_FILE_STORAGE = 'borcelle_crm.storage_backends.PublicMediaStorage'
+    # s3 private media settings
+    PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
+    PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
+else:
+    # Static files (CSS, JavaScript, Images)
+    # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = 'static/'
+    STATIC_URL = '/static/'
+
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
 # CELERY STUFF
 # CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_BROKER_URL = config("REDISCLOUD_URL")
