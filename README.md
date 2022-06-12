@@ -19,11 +19,11 @@ This project provides following features
 3. Progress Bar is Implemented with Ajax as well as Channels
 
 
--Implemented Celery Beat to Schedule Emails as Reminders
+-Implemented Celery Beat to Schedule Emails as Messages
 
-1. Used Celery beat to Schedule Reminder Emails
+1. Used Celery beat to Schedule Message Emails
 2. used asyncio inside Signals Code to avoid interference with sync_to_async
-3. As soon as task is completed a notification is send to user about its completion
+3. As soon as task is completed a notification is send to CRM manager about its completion
 
 -Broadcast Notifications using Web Sockets and Channels
 
