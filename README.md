@@ -1,7 +1,15 @@
 
-# Clock Works | Django Redis/RabbitMQ Celery Email Scheduler and Notes Taker
+# Borcelle CRM | Django Redis/RabbitMQ Celery
 
 This project provides following features
+
+-Implemented CRM
+    
+1. A user can register and start adding his contacts separately which are private to him
+2. You can do CRUD operation with your contacts
+3. Message your contacts via portal which will be emailed to them to their email.
+4. Check history of messages
+
 
 -Implemented Celery and Redis to Take Notes and Email it.
     

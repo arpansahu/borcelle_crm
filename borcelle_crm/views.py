@@ -6,7 +6,7 @@ from .tasks import test_func
 
 class Home(View):
     def get(self, *args, **kwargs):
-        return render(self.request, template_name='Home.html', context={'room_name': "broadcast"})
+        return render(self.request, template_name='old/Home.html', context={'room_name': "broadcast"})
 
 
 class CeleryTest(View):

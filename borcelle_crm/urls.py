@@ -42,10 +42,16 @@ from account.views import (
     AccountView,
 )
 
+from manager.views import (
+    HomeView,
+    search_phone, search_name, search_country_code, search_gst, search_email,
+    ContactsCreateView, ContactsView, ContactDetailView, ContactsUpdateView, ContactsDeleteView
+)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^celery-progress/', include('celery_progress.urls')),
-    path('', Home.as_view(), name='home'),
+    path('home', Home.as_view(), name='home'),
     path('test', CeleryTest.as_view(), name="test"),
     path('sendmailtoall/', CelerySendMailToAll.as_view(), name="sendmail_to_all"),
     path('schedule_mail/', ScheduleMail.as_view(), name="schedule_mail"),
@@ -55,18 +61,18 @@ urlpatterns = [
     path('test/notification/', test, name='test_notification'),
     re_path('tasks/', include('tasks.urls')),
 
-    # path('', HomeView.as_view(), name='home'),
-    # path('contact/', ContactsView.as_view(), name='contact'),
-    # path('contact/add/', ContactsCreateView.as_view(), name='contact-create'),
-    # path('contact/<pk>/', ContactDetailView.as_view(), name='contact-detailed'),
-    # path('contact/<pk>/update', ContactsUpdateView.as_view(), name='contact-update'),
-    # path('contact/<pk>/delete', ContactsDeleteView.as_view(), name='contact-delete'),
-    # # autocomplete views
-    # path('search-user-email/', search_email, name='search-user-email'),
-    # path('search-user-gst/', search_gst, name='search-user-gst'),
-    # path('search-user-phone/', search_phone, name='search-user-phone'),
-    # path('search-user-name/', search_name, name='search-user-name'),
-    # path('search-country-code/', search_country_code, name='search-country-code'),
+    path('', HomeView.as_view(), name='home'),
+    path('contact/', ContactsView.as_view(), name='contact'),
+    path('contact/add/', ContactsCreateView.as_view(), name='contact-create'),
+    path('contact/<pk>/', ContactDetailView.as_view(), name='contact-detailed'),
+    path('contact/<pk>/update', ContactsUpdateView.as_view(), name='contact-update'),
+    path('contact/<pk>/delete', ContactsDeleteView.as_view(), name='contact-delete'),
+    # autocomplete views
+    path('search-user-email/', search_email, name='search-user-email'),
+    path('search-user-gst/', search_gst, name='search-user-gst'),
+    path('search-user-phone/', search_phone, name='search-user-phone'),
+    path('search-user-name/', search_name, name='search-user-name'),
+    path('search-country-code/', search_country_code, name='search-country-code'),
 
     path('register/', registration_view, name='register'),
     path('logout/', LogoutView.as_view(), name='logout'),

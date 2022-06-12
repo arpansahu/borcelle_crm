@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %} CLOCK WORK REMINDER & NOTES {% endblock title %}
-
+{% block title %} Borcelle CRM {% endblock title %}
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}
 <style>
@@ -27,282 +26,256 @@
 {% endblock stylesheets %}
 
 {% block content %}
-<div class="row">
-    <div class="row" style="margin-bottom: 20px">
-        <div class="col-xl-12 col-sm-6 mb-xl-0 mb-4">
-          <div class="card">
-            <div class="card-body p-4">
-              <div class="row">
-                <h6 class="mb-0">Take Notes: </h6>
-                  <div id="progress-bar-ajax">
 
-
+<div class="container-fluid py-4">
+    <div class="row" style="margin-bottom: 10px">
+        <form method="GET" action="{% url 'home' %}" id="form-home">
+            <div class="col-md-12 mb-lg-0 mb-4">
+                <div class="card mt-4">
+              <div class="card-header pb-0 p-3">
+                <div class="row">
+                  <div class="col-3 d-flex align-items-center">
+                    <h6 class="mb-0">Search for a Contact</h6>
                   </div>
-                <div class="form-group">
-                  <label for="example-text-input" class="form-control-label">Headline</label>
-                  <input style="background-color: #e9ecef" class="form-control color-background" type="text" value="Headline" id="headline-input" name="headline-input">
-                </div>
-                <div class="form-group">
-                  <label for="example-email-input" class="form-control-label">Receivers Emails (use space to fill multiple emails)</label>
-                  <input style="background-color: #e9ecef" class="form-control" type="email" value="Enter emails" id="emails-input" name="emails-input">
-                </div>
-                <div class="form-group">
-                  <label for="example-text-input" class="form-control-label" >Content</label>
-                  <textarea  style="background-color: #e9ecef" class="form-control autoExpand" name="content-input" rows="3" cols="50" id="content-input"> Type here ... </textarea>
-                </div>
-                <div class="form-check form-switch" style="margin-left: 10px">
-                  <input  class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" name="is_scheduled" >
-                  <label class="form-check-label" for="flexSwitchCheckDefault">Schedule</label>
-                </div>
-                <div class="form-group" id="datetime-input-div">
-                </div>
-                  <div id="submit-button-div">
-                      <button id="submit-button-ajax" type="button" class="btn btn-primary btn-lg w-100">Email Note with Ajax</button>
-                      <button id="submit-button-channels" type="button" class="btn btn-primary btn-lg w-100">Email Note with Channels</button>
+                  <div class="col-9 text-end">
+                    <a class="btn bg-gradient-dark mb-0" href="{% url 'contact-create' %}" id="add-location"><i class="fas fa-plus"></i>&nbsp;&nbsp;Add New Contact</a>
                   </div>
+                </div>
               </div>
+              <div class="card-body p-3">
+                <div class="row">
+                  <div class="col-md-4 mb-md-0 mb-4">
+                    <div id="autocomplete-user-country-code" class="autocomplete">
+                      <div class="col-6 d-flex align-items-center" style="margin: 5px">
+                        <h6 class="mb-0">Enter Country Code with +</h6>
+                      </div>
+                      <input type="text" class="autocomplete-input" name="country_code" id="country-code" value="{{ country_code }}" placeholder="Search Country Code..."/>
+                      <ul class="autocomplete-result-list"></ul>
+                    </div>
+                  </div>
+                  <div class="col-md-4 mb-md-0 mb-4">
+                    <div id="autocomplete-user-phone" class="autocomplete">
+                      <div class="col-6 d-flex align-items-center" style="margin: 5px">
+                        <h6 class="mb-0">Enter Phone No</h6>
+                      </div>
+                      <input type="text" class="autocomplete-input" name="user_phone" id="user-phone" value="{{ user_phone }}" placeholder="Search Phone No..."/>
+                      <ul class="autocomplete-result-list"></ul>
+                    </div>
+                  </div>
+                  <div class="col-md-4 mb-md-0 mb-4">
+                    <div id="autocomplete-user-name" class="autocomplete">
+                      <div class="col-6 d-flex align-items-center" style="margin: 5px">
+                        <h6 class="mb-0">Enter Name</h6>
+                      </div>
+                      <input class="autocomplete-input" name="user_name" id="user-name" value="{{ user_name }}" placeholder="Search Name..."/>
+                      <ul class="autocomplete-result-list"></ul>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-md-0 mb-4">
+                    <div id="autocomplete-user-email" class="autocomplete">
+                      <div class="col-6 d-flex align-items-center" style="margin: 5px">
+                        <h6 class="mb-0">Enter Email Id</h6>
+                      </div>
+                      <input type="text" class="autocomplete-input" name="user_email" id="user-email" value="{{ user_email }}" placeholder="Search Email Id..."/>
+                      <ul class="autocomplete-result-list"></ul>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-md-0 mb-4">
+                    <div id="autocomplete-user-gst" class="autocomplete">
+                      <div class="col-6 d-flex align-items-center" style="margin: 5px">
+                        <h6 class="mb-0">Enter GST No</h6>
+                      </div>
+                      <input type="text" class="autocomplete-input" name="user_gst" id="user-gst" value="{{ user_gst }}" placeholder="Search GST No..."/>
+                      <ul class="autocomplete-result-list"></ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer text-center pt-0 px-lg-2 px-1">
+                <input type="submit" value="Search" id="submit-search" class="btn bg-gradient-success w-auto " >
+              </div>
+            </div>
+            </div>
+        </form>
+    </div>
+        <div class="row">
+      <div class="col-12">
+        <div class="card mb-4">
+          <div class="card-header pb-0">
+            <h6>Locations</h6>
+          </div>
+          <div class="card-body px-0 pt-0 pb-2">
+            <div class="table-responsive p-0">
+              <table class="table align-items-center mb-0">
+                <thead>
+                  <tr>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Email</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Phone Number</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for contact in contacts %}
+                  <tr>
+                    <td id="contact_name_td" >
+                      {{ contact.name }}
+                    </td>
+                    <td id="contact_email_td">
+                      {{ contact.email }}
+                    </td>
+                    <td id="contact_phone_td">
+                      {{ contact.phone }}
+                    </td>
+                    <td class="align-middle text-center">
+                      <a href="{% url 'contact-detailed' contact.id %}" class="badge badge-sm bg-gradient-info" data-toggle="tooltip" data-original-title="View">
+                        View
+                      </a>
+                      <a href="{% url 'contact-update' contact.id %}" id="edit-student-button" class="badge badge-sm bg-gradient-faded-dark" data-toggle="tooltip" data-original-title="Edit">
+                        Edit
+                      </a>
+                      <a href="{% url 'contact-delete' contact.id %}" id="delete-student-button" class="badge badge-sm bg-gradient-faded-danger" data-toggle="tooltip" data-original-title="Edit">
+                        Delete
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
+      </div>
     </div>
+    <!--Pagination-->
 
+    <!--end of Pagination-->
 </div>
-    {{ room_name|json_script:"room-name" }}
 {% endblock content %}
 
-  <!-- Jquery/AJAX -->
-  <script src="{% static 'js/jquery.js' %}"></script>
+
+
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
-    <script>
-    let ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
-    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+  <script>
+new Autocomplete('#autocomplete-user-email', {
+          search: input => {
+              const url = {% url 'search-user-email' %} + `?email=${input}`
+              return new Promise(resolve => {
+                  fetch(url)
+                  .then(response => response.json())
+                  .then(data => {
+                      resolve(data.data)
+                  })
+              })
+          }
+        })
+    new Autocomplete('#autocomplete-user-gst', {
+          search: input => {
+              const url = {% url 'search-user-gst' %} + `?gst=${input}`
+              return new Promise(resolve => {
+                  fetch(url)
+                  .then(response => response.json())
+                  .then(data => {
+                      resolve(data.data)
+                  })
+              })
+          }
+        })
+    new Autocomplete('#autocomplete-user-country-code', {
+          search: input => {
+              const url = {% url 'search-country-code' %} + `?country_code=${input}`
+              return new Promise(resolve => {
+                  fetch(url)
+                  .then(response => response.json())
+                  .then(data => {
+                      resolve(data.data)
+                  })
+              })
+          }
+        })
+    new Autocomplete('#autocomplete-user-phone', {
+          search: input => {
+              const url = {% url 'search-user-phone' %} + `?phone=${input}`
+              return new Promise(resolve => {
+                  fetch(url)
+                  .then(response => response.json())
+                  .then(data => {
+                      resolve(data.data)
+                  })
+              })
+          }
+        })
+    new Autocomplete('#autocomplete-user-name', {
+          search: input => {
+              const url = {% url 'search-user-name' %} + `?name=${input}`
+              return new Promise(resolve => {
+                  fetch(url)
+                  .then(response => response.json())
+                  .then(data => {
+                      console.log(data)
+                      resolve(data.data)
+                  })
+              })
+          }
+        })
+    $('#user-gst').on('click', function () {
+        $('#user-gst').val('');
+        $("form").submit(function(e){
+            $(this).unbind('submit').submit();
+        });
+    })
+    $('#user-email').on('click', function () {
+        $('#user-email').val('');
+        $("form").submit(function(e){
+            $(this).unbind('submit').submit();
+        });
+    })
+    $('#user-phone').on('click', function () {
+        $('#user-phone').val('');
+        $("form").submit(function(e){
+            $(this).unbind('submit').submit();
+        });
+    })
 
-    const notificationSocket = new WebSocket(
-        ws_scheme +'://'
-        + window.location.host
-        + '/ws/notification/'
-        + roomName
-        + '/'
-    );
+    $('#country-code').on('click', function () {
+        $('#country-code').val('');
+        $("form").submit(function(e){
+            $(this).unbind('submit').submit();
+        });
+    })
 
-    notificationSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        //document.querySelector('#chat-log').value += (data.message + '\n');
-        console.log(data);
-        document.getElementById("notifications-dropdown").innerHTML =
-            {#"<li class='dropdown-item'>" + data + "</li><hr class='dropdown-divider'>" + document.getElementById("notifications-dropdown").innerHTML;#}
-            '<li class="mb-2">' +
-             ' <a class="dropdown-item border-radius-md" href="javascript:;">' +
-               ' <div class="d-flex py-1">' +
-                 ' <div class="my-auto">' +
-                    '<img src="/static/assets/img/notify-icon.svg" class="avatar avatar-sm  me-3 ">' +
-'                  </div>'+
-       '           <div class="d-flex flex-column justify-content-center">'+
-                  '  <h6 class="text-sm font-weight-normal mb-1">'+
-                      '<span class="font-weight-bold">'+ data +'</span>'+
-              '      </h6>'+
-                 '   <p class="text-xs text-secondary mb-0 ">'+
-                    '  <i class="fa fa-clock me-1"></i>'+
-                     new Date() +
-        '            </p>'+
-          '        </div>'+
-          '      </div>'+
-          '    </a>'+
-           ' </li>'
-            + document.getElementById("notifications-dropdown").innerHTML;
-        document.getElementById("notification-badge").innerHTML = parseInt(document.getElementById("notification-badge").innerHTML) + 1;
-    };
-
-    notificationSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-    };
+    $('#user-name').on('click', function () {
+        $('#user-name').val('');
+        $("form").submit(function(e){
+            $(this).unbind('submit').submit();
+        });
+    })
 
 
-     function getScrollHeight(elm){
-          var savedValue = elm.value
-          elm.value = ''
-          elm._baseScrollHeight = elm.scrollHeight
-          elm.value = savedValue
-     }
-
-     function onExpandableTextareaInput({ target:elm }){
-          // make sure the input event originated from a textarea and it's desired to be auto-expandable
-          if( !elm.classList.contains('autoExpand') || !elm.nodeName == 'TEXTAREA' ) return
-
-          var minRows = elm.getAttribute('data-min-rows')|0, rows;
-          !elm._baseScrollHeight && getScrollHeight(elm)
-
-          elm.rows = minRows
-          rows = Math.ceil((elm.scrollHeight - elm._baseScrollHeight) / 16)
-          elm.rows = minRows + rows
-     }
-
-    // global delegated event listener
-    document.addEventListener('input', onExpandableTextareaInput)
+    $('#submit-search').on('click', function (e) {
+        var name = $('#user-name').val();
+        var gst = $('#user-gst').val();
+        var email = $('#user-email').val();
+        var phone = $('#user-phone').val();
+        var country_code = $('#country-code').val();
 
 
-
-    $('#flexSwitchCheckDefault').on('click', function (){
-       {#alert('clicked');#}
-       if ($(this).is(':checked')) {
-            $('#datetime-input-div').html('<label for="example-datetime-local-input" class="form-control-label">Choose Date and Time</label>' +
-                '<input class="form-control" type="datetime-local" value="2018-11-23T10:30:00" id="datetime-input" name="datetime-input">'
-            )
-            $("#datetime-input").val(new Date().toJSON().slice(0,19));
-            $('#submit-button-ajax').text('Schedule Reminder with AJAX')
-            $('#submit-button-channels').text('Schedule Reminder with Channels')
-        }
-       else {
-           $('#datetime-input-div').html('')
-           $('#submit-button-ajax').text('Email Note with AJAX')
-           $('#submit-button-channels').text('Email Note with Channels')
-        }
-    });
-
-
-
-
-
-     $('#submit-button-ajax').click(function () {
-        var headline = $('#headline-input').val();
-        var content = $('#content-input').val();
-        var emails = $('#emails-input').val();
-        var scheduled = $('#flexSwitchCheckDefault').is(':checked');
-        if (scheduled){
-             var datetime = $('#datetime-input').val();
-             $.ajax({
-                 type: 'POST',
-                 url: "{% url 'schedule_mail' %}",
-                 data: {
-                        csrfmiddlewaretoken: '{{ csrf_token }}',
-                        headline: headline,
-                        content: content,
-                        emails: emails,
-                        datetime: datetime
-                    },
-                 dataType: 'json',
-                 success: function(data) {
-                    Swal.fire({
-                            icon: 'success',
-                            title: 'success',
-                            text: data.message,
-                        }).then(() => {
-                            {#location.reload();#}
-                        }
-                    )
-                 },
-                 error: function(data){
-                     Swal.fire({
-                            title: 'Oops...',
-                            text: "Reminder Cannot be Set",
-                            icon: 'error',
-                        });
-                        return false;
-                 }
+        if (!gst && !name && !email && !phone && !country_code) {
+            console.log(typeof id, typeof id);
+            $("form").submit(function(e){
+                e.preventDefault();
+            });
+            Swal.fire({
+                title: 'Oops...',
+                text: "All Field both cannot be Empty",
+                icon: 'error',
             });
         }
-        else{
-            $.ajax({
-             type: 'POST',
-             url: "{% url 'send_mail' %}",
-             data: {
-                    headline: headline,
-                    content: content,
-                    emails: emails,
-                    csrfmiddlewaretoken: '{{ csrf_token }}',
-                },
-             dataType: 'json',
-             success: function(data) {
-                      $('#progress-bar-ajax').html('<div class="progress-wrapper"><div id="progress-bar" class="progress-bar" style="background-color: #68a9ef; width: 0%;">&nbsp;</div></div>' +
-                        '<div id="progress-bar-message">Waiting for progress to start...</div>'
-                      )
-                      $(function () {
-                          var progressUrl =  'celery-progress/' +  data.task_id + '/';
-                          CeleryProgressBar.initProgressBar(progressUrl);
-                      });
-             },
-             error: function(data){
-                 Swal.fire({
-                        title: 'Oops...',
-                        text: "Notes Cannot be Sent",
-                        icon: 'error',
-                    });
-                    return false;
-             }
-            });
-        }
-     });
+    })
+  </script>
 
-     $('#submit-button-channels').click(function () {
-        var headline = $('#headline-input').val();
-        var content = $('#content-input').val();
-        var emails = $('#emails-input').val();
-        var scheduled = $('#flexSwitchCheckDefault').is(':checked');
-        if (scheduled){
-             var datetime = $('#datetime-input').val();
-             $.ajax({
-                 type: 'POST',
-                 url: "{% url 'schedule_mail' %}",
-                 data: {
-                        csrfmiddlewaretoken: '{{ csrf_token }}',
-                        headline: headline,
-                        content: content,
-                        emails: emails,
-                        datetime: datetime
-                    },
-                 dataType: 'json',
-                 success: function(data) {
-                    Swal.fire({
-                            icon: 'success',
-                            title: 'success',
-                            text: data.message,
-                        }).then(() => {
-                            {#location.reload();#}
-                        }
-                    )
-                 },
-                 error: function(data){
-                     Swal.fire({
-                            title: 'Oops...',
-                            text: "Reminder Cannot be Set",
-                            icon: 'error',
-                        });
-                        return false;
-                 }
-            });
-        }
-        else{
-            $.ajax({
-                 type: 'POST',
-                 url: "{% url 'web_socket_send_mail' %}",
-                 data: {
-                        headline: headline,
-                        content: content,
-                        emails: emails,
-                        csrfmiddlewaretoken: '{{ csrf_token }}',
-                    },
-                 dataType: 'json',
-                 success: function(data) {
-                          $('#progress-bar-ajax').html('<div class="progress-wrapper"><div id="progress-bar" class="progress-bar" style="background-color: #68a9ef; width: 0%;">&nbsp;</div></div>' +
-                            '<div id="progress-bar-message">Waiting for progress to start...</div>'
-                          )
-                          $(function () {
-                              var progressUrl =  '/ws/progress/' +  data.task_id + '/';
-                              CeleryWebSocketProgressBar.initProgressBar(progressUrl);
-                          });
-                 },
-                 error: function(data){
-                     Swal.fire({
-                            title: 'Oops...',
-                            text: "Notes Cannot be Sent",
-                            icon: 'error',
-                        });
-                        return false;
-                 }
-            });
-        }
-     });
 
-    </script>
 {% endblock javascripts %}

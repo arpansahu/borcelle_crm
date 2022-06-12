@@ -79,4 +79,4 @@ class WebSocketSendMail(views.JSONResponseMixin, views.AjaxResponseMixin, View):
 
 def ws_view(request):
     result = ws_task.delay(number=100)
-    return render(request, 'ws.html', context={'task_ids': [result.task_id]})
+    return render(request, 'old/ws.html', context={'task_ids': [result.task_id]})

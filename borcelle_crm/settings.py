@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'send_email_app',
-    'notifications_app'
+    'notifications_app',
+    'manager'
 ]
 
 MIDDLEWARE = [
@@ -137,6 +138,12 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "account.Account"
+
+# Login_required Decorator
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+
+LOGIN_REDIRECT_URL = "/"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
