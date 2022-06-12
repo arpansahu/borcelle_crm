@@ -14,3 +14,10 @@ class Contacts(AbstractBaseModel):
     phone = models.CharField(max_length=15)
     email = models.EmailField(verbose_name="email", max_length=60)
     owner = models.ForeignKey(Account, on_delete=models.CASCADE)
+
+
+class Message(AbstractBaseModel):
+    message = models.CharField(max_length=30000)
+    contact = models.ForeignKey(Contacts, on_delete=models.CASCADE)
+    success = models.BooleanField(default=False)
+    scheduled = models.BooleanField(default=False)

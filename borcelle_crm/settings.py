@@ -42,7 +42,6 @@ INSTALLED_APPS = [
 
     'account',
     'borcelle_crm',
-    'tasks',
     'celery_progress',
     'django_celery_beat',
     'django_celery_results',

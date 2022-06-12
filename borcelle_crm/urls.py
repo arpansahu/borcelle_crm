@@ -17,22 +17,11 @@ from django.contrib import admin
 from django.urls import path, re_path, include
 from django.contrib.auth import views as auth_views
 
-from .views import (
-    CeleryTest,
-    Home
-)
-
 from send_email_app.views import (
-    CelerySendMailToAll,
     ScheduleMail,
-    SendMail,
     WebSocketSendMail,
-    ws_view
 )
 
-from notifications_app.views import (
-    test,
-)
 
 from account.views import (
     CustomPasswordResetView,
@@ -50,16 +39,11 @@ from manager.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     re_path(r'^celery-progress/', include('celery_progress.urls')),
-    path('home', Home.as_view(), name='home'),
-    path('test', CeleryTest.as_view(), name="test"),
-    path('sendmailtoall/', CelerySendMailToAll.as_view(), name="sendmail_to_all"),
     path('schedule_mail/', ScheduleMail.as_view(), name="schedule_mail"),
-    path('send_mail/', SendMail.as_view(), name="send_mail"),
-    path('web-socket-send-mail/', SendMail.as_view(), name="web_socket_send_mail"),
+    path('web-socket-send-mail/', WebSocketSendMail.as_view(), name="web_socket_send_mail"),
     path('celery-progress/', include('celery_progress.urls')),
-    path('test/notification/', test, name='test_notification'),
-    re_path('tasks/', include('tasks.urls')),
 
     path('', HomeView.as_view(), name='home'),
     path('contact/', ContactsView.as_view(), name='contact'),

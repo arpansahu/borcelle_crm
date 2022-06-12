@@ -160,7 +160,7 @@
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
   <script>
-new Autocomplete('#autocomplete-user-email', {
+    new Autocomplete('#autocomplete-user-email', {
           search: input => {
               const url = {% url 'search-user-email' %} + `?email=${input}`
               return new Promise(resolve => {

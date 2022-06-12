@@ -72,6 +72,7 @@
 
 </div>
     {{ room_name|json_script:"room-name" }}
+
 {% endblock content %}
 
   <!-- Jquery/AJAX -->
@@ -152,11 +153,11 @@
                 '<input class="form-control" type="datetime-local" value="2018-11-23T10:30:00" id="datetime-input" name="datetime-input">'
             )
             $("#datetime-input").val(new Date().toJSON().slice(0,19));
-            $('#submit-button-channels').text('Schedule Reminder with Channels')
+            $('#submit-button-channels').text('Schedule New Message')
         }
        else {
            $('#datetime-input-div').html('')
-           $('#submit-button-channels').text('Email Note with Channels')
+           $('#submit-button-channels').text('Send New Message')
         }
     });
 
@@ -175,7 +176,8 @@
                         headline: headline,
                         content: content,
                         emails: emails,
-                        datetime: datetime
+                        datetime: datetime,
+                        contact_id: {{ contact.id }}
                     },
                  dataType: 'json',
                  success: function(data) {
@@ -207,6 +209,7 @@
                         content: content,
                         emails: emails,
                         csrfmiddlewaretoken: '{{ csrf_token }}',
+                        contact_id: {{ contact.id }}
                     },
                  dataType: 'json',
                  success: function(data) {

@@ -9,31 +9,10 @@ from braces import views
 # Create your views here.
 from django.views import View
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
-from .tasks import send_mail_func, send_mail_task, ws_task, web_socket_send_mail_task
+from .tasks import web_socket_send_mail_task
 from celery_progress.backend import ProgressRecorder
 
 
-class CelerySendMailToAll(View):
-    def get(self, *args, **kwargs):
-        send_mail_func.delay()
-        return HttpResponse("Done")
-
-
-class SendMail(views.JSONResponseMixin, views.AjaxResponseMixin, View):
-    def post_ajax(self, request, *args, **kwargs):
-        headline = request.POST.get('headline')
-        emails = request.POST.get('emails').split(' ')
-        content = request.POST.get('content')
-        print(emails)
-        try:
-            # raise TypeError("Only integers are allowed")
-            # send_mail_task.delay(emails, headline, content)
-            task = send_mail_task.apply_async(args=[emails, headline, content])
-            return self.render_json_response({"status": "Success", "message": "Notes Send", "task_id": task.task_id},
-                                             status=200)
-        except Exception as e:
-            print("inside Exception")
-            return self.render_json_response({"status": "Failed", "message": "Notes Can't be Sent"}, status=400)
 
 
 class ScheduleMail(views.JSONResponseMixin, views.AjaxResponseMixin, View):
@@ -76,7 +55,3 @@ class WebSocketSendMail(views.JSONResponseMixin, views.AjaxResponseMixin, View):
             print("inside Exception")
             return self.render_json_response({"status": "Failed", "message": "Notes Can't be Sent"}, status=400)
 
-
-def ws_view(request):
-    result = ws_task.delay(number=100)
-    return render(request, 'old/ws.html', context={'task_ids': [result.task_id]})
