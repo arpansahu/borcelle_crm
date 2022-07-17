@@ -178,7 +178,7 @@ class PasswordResetForm(forms.Form):
                 {
                     "From": {
                         "Email": "admin@arpansahu.me",
-                        "Name": "School Chale Hum"
+                        "Name": "Borcelle CRM"
                     },
                     "To": [
                         {
