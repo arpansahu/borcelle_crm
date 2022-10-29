@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    env_file: ./.env
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne borcelle_crm.asgi:application -b 0.0.0.0 --port 8014 & celery -A borcelle_crm.celery worker -l info & celery -A borcelle_crm beat -l INFO"
+    image: borcelle_crm
+    container_name: borcelle_crm
+    volumes:
+      - .:/borcelle_crm
+    ports:
+      - "8014:8014"
