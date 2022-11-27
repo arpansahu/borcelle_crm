@@ -240,10 +240,9 @@ else:
 
 
 #Caching
-
 CACHES = {
     "default": {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": config('REDISCLOUD_URL'),
     }
 }
