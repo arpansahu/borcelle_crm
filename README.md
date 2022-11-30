@@ -1,5 +1,5 @@
 
-# Borcelle CRM | Django Redis/RabbitMQ Celery
+# Borcelle CRM | Django Redis/RabbitMQ Celery test
 
 This project provides following features
 
