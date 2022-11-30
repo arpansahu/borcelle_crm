@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Deploy') {
+        stage('Production') {
             steps {
                 script {
                     sh "docker rm -f borcelle_crm"
