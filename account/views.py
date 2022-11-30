@@ -76,7 +76,7 @@ def send_mail_account_activate(reciever_email, user, SUBJECT="Confirm Your Email
         'Messages': [
             {
                 "From": {
-                    "Email": "admin@arpansahu.me",
+                    "Email": settings.MAIL_JET_EMAIL_ADDRESS,
                     "Name": "Borcelle CRM"
                 },
                 "To": [

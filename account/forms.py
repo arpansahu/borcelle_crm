@@ -177,7 +177,7 @@ class PasswordResetForm(forms.Form):
             'Messages': [
                 {
                     "From": {
-                        "Email": "admin@arpansahu.me",
+                        "Email": settings.MAIL_JET_EMAIL_ADDRESS,
                         "Name": "Borcelle CRM"
                     },
                     "To": [
