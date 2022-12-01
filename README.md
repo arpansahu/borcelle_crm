@@ -1202,7 +1202,7 @@ Configure a Jenkins project from jenkins ui located at https://jenkins.arpansahu
 
 Make sure to use Pipline project and name it whatever you want I have named it as borcelle_crm_declarative_pipeline_project
 
-![alt text](https://github.com/arpansahu/borcelle_crm/blob/master/borcelle_crm_declarative_pipeline_project_Config_[Jenkins].png?raw=true)
+![Jenkins Project for borcelle CRM Configuration File](https://github.com/arpansahu/borcelle_crm/blob/master/borcelle_crm_declarative_pipeline_project_Config_[Jenkins].png?raw=true)
 
 
 ## Documentation
