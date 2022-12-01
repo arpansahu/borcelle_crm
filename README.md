@@ -1099,35 +1099,35 @@ Now for serving the Jenkins UI from Nginx add these following lines to the Nginx
 sudo vi /etc/nginx/sites-available/arpansahu
 ```
 
-Add these lines to it.
+* Add these lines to it.
 
-```
-server {
-    listen         80;
-    server_name    jenkins.arpansahu.me;
-    # force https-redirects
-    if ($scheme = http) {
-        return 301 https://$server_name$request_uri;
+    ```
+    server {
+        listen         80;
+        server_name    jenkins.arpansahu.me;
+        # force https-redirects
+        if ($scheme = http) {
+            return 301 https://$server_name$request_uri;
+            }
+    
+        location / {
+             proxy_pass              http://localhost:8080;
+             proxy_set_header        Host $host;
+             proxy_set_header    X-Forwarded-Proto $scheme;
         }
-
-    location / {
-         proxy_pass              http://localhost:8080;
-         proxy_set_header        Host $host;
-         proxy_set_header    X-Forwarded-Proto $scheme;
+    
+        listen 443 ssl; # managed by Certbot
+        ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
+        ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+        include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
     }
-
-    listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-}
-```
+    ```
 
 You can add all the server blocks to the same nginx configuration file
 just make sure you place the server block for base domain at the last
 
-Now Create a file named Jenkinsfile at the root of Git Repo and add following lines to file
+* Now Create a file named Jenkinsfile at the root of Git Repo and add following lines to file
 
 ```
 pipeline {
@@ -1198,11 +1198,37 @@ pipeline {
 }
 ```
 
-Configure a Jenkins project from jenkins ui located at https://jenkins.arpansahu.me
+* Configure a Jenkins project from jenkins ui located at https://jenkins.arpansahu.me
 
 Make sure to use Pipline project and name it whatever you want I have named it as borcelle_crm_declarative_pipeline_project
 
 ![Jenkins Project for borcelle CRM Configuration File](https://github.com/arpansahu/borcelle_crm/blob/master/borcelle_crm_declarative_pipeline_project_Config_[Jenkins].png?raw=true)
+
+In this above picture you can see credentials right? you can add your github credentials
+from Manage Jenkins on home Page --> Manage Credentials
+
+and add your GitHub credentials from there
+
+* Add a .env file to you project using following command
+
+    ```
+    sudo vi  /var/lib/jenkins/workspace/borcelle_crm_declarative_pipeline_project/.env
+    ```
+
+    Your workspace name may be different.
+
+    Add all the env variables as required and mentioned in the Readme File.
+
+* Add Global Jenkins Variables from Dashboard --> Manage --> Jenkins
+  Configure System
+ 
+  * MAIL_JET_API_KEY
+  * MAIL_JET_API_SECRET
+  * MAIL_JET_EMAIL_ADDRESS
+  * MY_EMAIL_ADDRESS
+
+Now you are good to go.
+
 
 
 ## Documentation
