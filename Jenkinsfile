@@ -4,7 +4,7 @@ pipeline {
         stage('Production') {
             steps {
                 script {
-                    sh "docker compose up --build --detach"
+                    sh "docker compose up --detach"
                 }
             }
         }
