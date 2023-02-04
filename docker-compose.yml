@@ -11,3 +11,4 @@ services:
       - .:/borcelle_crm
     ports:
       - "8014:8014"
+      - "6379:6379"
