@@ -15,15 +15,16 @@ from .tasks import web_socket_send_mail_task
 from celery_progress.backend import ProgressRecorder
 
 
-
-
 class ScheduleMail(views.JSONResponseMixin, views.AjaxResponseMixin, View):
     def post_ajax(self, request, *args, **kwargs):
         headline = request.POST.get('headline')
         emails = request.POST.get('emails').split(' ')
         content = request.POST.get('content')
         date_time = request.POST.get('datetime')
-        date = datetime.datetime.strptime(date_time, '%Y-%m-%dT%H:%M:%S')
+        try:
+            date = datetime.datetime.strptime(date_time, '%Y-%m-%dT%H:%M:%S')
+        except:
+            date = datetime.datetime.strptime(date_time, '%Y-%m-%dT%H:%M')
         contact_id = int(request.POST.get('contact_id'))
         print(emails)
 
@@ -62,4 +63,3 @@ class WebSocketSendMail(views.JSONResponseMixin, views.AjaxResponseMixin, View):
         except Exception as e:
             print(f"inside Exception {e}")
             return self.render_json_response({"status": "Failed", "message": "Notes Can't be Sent"}, status=400)
-
