@@ -1223,7 +1223,7 @@ Note: agent {label 'local'} is used to specify which node will execute the jenki
 
 * Configure a Jenkins project from jenkins ui located at https://jenkins.arpansahu.me
 
-Make sure to use Pipline project and name it whatever you want I have named it as borcelle_crm_declarative_pipeline_project
+Make sure to use Pipline project and name it whatever you want I have named it as borcelle_crm
 
 ![Jenkins Project for borcelle CRM Configuration File](https://github.com/arpansahu/borcelle_crm/blob/master/borcelle_crm_jenkins_config.png?raw=true)
 
@@ -1235,7 +1235,7 @@ and add your GitHub credentials from there
 * Add a .env file to you project using following command
 
     ```
-    sudo vi  /var/lib/jenkins/workspace/borcelle_crm_declarative_pipeline_project/.env
+    sudo vi  /var/lib/jenkins/workspace/borcelle_crm/.env
     ```
 
     Your workspace name may be different.
