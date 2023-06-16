@@ -1218,7 +1218,7 @@ pipeline {
 ```
 Note: agent {label 'local'} is used to specify which node will execute the jenkins job deployment. Basically there are two nodes in this project 
       One is my local Linux Server and Another is AWS EC2 machine where nginx is hosted there arpansahu.me my portfolio is also hosted is also hosted.
-      So local linux server is labelled with 'local' are the project with this label will be executed in local machine node
+      So local linux server is labelled with 'local' are the project with this label will be executed in local machine node.
 
 
 * Configure a Jenkins project from jenkins ui located at https://jenkins.arpansahu.me
