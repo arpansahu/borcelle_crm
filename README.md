@@ -1278,6 +1278,8 @@ Now you are good to go.
 
 To run this project, you will need to add the following environment variables to your .env file
 
+DATABASE_URL=
+
 REDISCLOUD_URL=
 
 SECRET_KEY=
@@ -1286,13 +1288,16 @@ DEBUG=
 
 ALLOWED_HOSTS=
 
-DATABASE_URL=
-
 MAIL_JET_API_KEY=
 
 MAIL_JET_API_SECRET=
 
 MAIL_JET_EMAIL_ADDRESS=
+
+DOMAIN=
+
+PROTOCOL=
+
 
 AWS_ACCESS_KEY_ID=
 
@@ -1300,10 +1305,9 @@ AWS_SECRET_ACCESS_KEY=
 
 AWS_STORAGE_BUCKET_NAME=
 
-AWS_S3_REGION_NAME= 
+# Blackblaze bucket instead of AWS S3 bucket
 
-DOMAIN=
-
-PROTOCOL=
+AWS_S3_REGION_NAME=
 
 BUCKET_TYPE=
+
