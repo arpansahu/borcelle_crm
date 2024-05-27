@@ -1,6 +1,13 @@
 pipeline {
     agent { label 'local' }
     stages {
+        stage('Dependencies') {
+            steps {
+                script {
+                    sh "sudo cp /root/projectenvs/borcelle_crm/.env /var/lib/jenkins/workspace/borcelle_crm"
+                }
+            }
+        }
         stage('Production') {
             steps {
                 script {
