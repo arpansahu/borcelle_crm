@@ -32,7 +32,7 @@ This project provides following features
 2. Used Daphene
 3. Used REDIS-CLOUD Sever, provided by heroku add-ons
 
--Deployed on AWS / Now in My Own Home Ubuntu Server LTS 22.0 
+-Deployed on AWS / Now in My Own Home Ubuntu Server LTS 22.0 / Hostinger VPS Server
 
 1. Used AWS EC2 Ubuntu 22.0 LTS
 2. Used Nginx as a Web Proxy Server
@@ -428,14 +428,16 @@ to
 CELERY_BROKER_URL=config("REDISCLOUD_URL")
 ```
 
-## Deployment on AWS EC2/ Home Server Ubuntu 22.0 LTS
+## Deployment on AWS EC2/ Home Server Ubuntu 22.0 LTS/ Hostinger VPS Server
 Previously This project was hosted on Heroku, but so I started hosting this and all other projects in a 
 Single EC2 Machine, which costed me a lot, so now I have shifted all the projects into my own Home Server with 
-Ubuntu 22.0 LTS Server, except for portfolio project at https://www.arpansahu.me along with Nginx 
+Ubuntu 22.0 LTS Server. The problem with home server was it also required constant electricity and a ubuntu machine
+along with excellent internet connection which was not possible for a long time since i do not live in a good location.
+So i again shifted to Hostinger VPS Server which was affordable and also good for hosting my all the projects in it.
 
 
-Now there is EC2 server running with a nginx server and arpansahu.me portfolio
-Nginx forward https://borcelle-crm.arpansahu.me/ to Home Server 
+There is a nginx server and arpansahu.me portfolio
+Nginx forward https://borcelle-crm.arpansahu.me/ to Server 
 
 Multiple Projects are running inside dockers so all projects are dockerized.
 You can refer to all projects on https://www.arpansahu.me/projects
@@ -967,12 +969,28 @@ Now It's time to enable HTTPS for this server
          ```
          sudo acme-dns-client register \
          -d arpansahu.me -s http://localhost:8090
+
+         Above command is old now we will use the new command 
+         sudo acme-dns-client register \
+          -d arpansahu.me \
+          -allow 0.0.0.0/0 \
+          -s http://localhost:8080
          ```
          Note: When we edited acme-dns config file there we mentioned the port 8090 and thats why we are using this port here also
        * Creating Another DNS Entry 
          ```
          CNAME Record	_acme-challenge	e6ac0f0a-0358-46d6-a9d3-8dd41f44c7ec.auth.arpansahu.me.	Automatic
          ```
+
+         Since the last update in  the last step now two more entries should be added 
+
+         ```
+         CAA Record @	0 issuewild "letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626"  Automatic
+
+         CAA Record @	0 issue "letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626"
+         Automatic
+         ```
+
          Same as an entry is needed to be added to complete one time challenge as in previously we did.
        * Check the entry is added successfully or not
          ```
