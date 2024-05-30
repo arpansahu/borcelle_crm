@@ -186,7 +186,7 @@ RabbitMQ is an open-source message-broker software that originally implemented t
 
 ## Demo
 
-Available at: https://crm-borcelle.herokuapp.com/
+Available at: https://borcelle-crm.arpansahu.me/
 
 admin login details:--
 username: admin@arpansahu.me
@@ -1145,6 +1145,24 @@ sudo vi /etc/nginx/sites-available/arpansahu
 
 You can add all the server blocks to the same nginx configuration file
 just make sure you place the server block for base domain at the last
+
+
+* To copy .env from local server directory while buidling image
+
+add Jenkins ALL=(ALL) NOPASSWD: ALL
+inside /etc/sudoers file
+
+and then put 
+
+stage('Dependencies') {
+            steps {
+                script {
+                    sh "sudo cp /root/env/project_name/.env /var/lib/jenkins/workspace/project_name"
+                }
+            }
+        }
+
+in jenkinsfile
 
 * Now Create a file named Jenkinsfile at the root of Git Repo and add following lines to file
 
