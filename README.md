@@ -543,7 +543,6 @@ to
 CELERY_BROKER_URL=config("REDISCLOUD_URL")
 ```
 
-
 ## Deployment on AWS EC2/ Home Server Ubuntu 22.0 LTS/ Hostinger VPS Server
 Previously This project was hosted on Heroku, but so I started hosting this and all other projects in a 
 Single EC2 Machine, which costed me a lot, so now I have shifted all the projects into my own Home Server with 
@@ -736,10 +735,10 @@ access_log                  /var/log/nginx/supersecure.access.log;
 error_log                   /var/log/nginx/supersecure.error.log;
 
 server {
-  server_name               borcelle-crm.arpansahu.me;        
+  server_name               arpansahu.me;        
   listen                    80;
   location / {
-    proxy_pass              http://{ip_of_home_server}:8014;
+    proxy_pass              http://{ip_of_home_server}:8000;
     proxy_set_header        Host $host;
   }
 }
@@ -828,7 +827,7 @@ Now It's time to enable HTTPS for this server
     error_log                   /var/log/nginx/supersecure.error.log;
      
     server {
-      server_name               borcelle-crm.arpansahu.me;
+      server_name               arpansahu.me;
       listen                    80;
       return                    307 https://$host$request_uri;
     }
@@ -836,7 +835,7 @@ Now It's time to enable HTTPS for this server
     server {
     
       location / {
-        proxy_pass              http://{ip_of_home_server}:8014;
+        proxy_pass              http://{ip_of_home_server}:8000;
         proxy_set_header        Host $host;
         
         listen 443 ssl; # managed by Certbot
@@ -1182,24 +1181,16 @@ error_log                   /var/log/nginx/supersecure.error.log;
 
 server {
     listen         80;
-    server_name    borcelle-crm.arpansahu.me;
+    server_name    arpansahu.me;
     # force https-redirects
     if ($scheme = http) {
         return 301 https://$server_name$request_uri;
         }
 
     location / {
-         proxy_pass              http://{ip_of_home_server}:8014;
+         proxy_pass              http://{ip_of_home_server}:8000;
          proxy_set_header        Host $host;
          proxy_set_header    X-Forwarded-Proto $scheme;
-
-	 # WebSocket support
-         proxy_http_version 1.1;
-         proxy_set_header Upgrade $http_upgrade;
-         proxy_set_header Connection "upgrade";
-    }
-   
-	
 
     listen 443 ssl; # managed by Certbot
     ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
@@ -1208,6 +1199,34 @@ server {
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 }
 ```
+
+Then add your borcelle-crm.arpansahu.me serber configuration to the  /etc/nginx/sites-available/arpansahu file
+```
+server {
+    listen         80;
+    server_name    borcelle-crm.arpansahu.me;
+    # force https-redirects
+    if ($scheme = http) {
+        return 301 https://$server_name$request_uri;
+        }
+
+    location / {
+         proxy_pass               http://0.0.0.0:8014;
+         proxy_set_header        Host $host;
+         proxy_set_header    X-Forwarded-Proto $scheme;
+
+         # WebSocket support
+         proxy_http_version 1.1;
+         proxy_set_header Upgrade $http_upgrade;
+         proxy_set_header Connection "upgrade";
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
 
 ### Step 4: CI/CD using Jenkins
 
@@ -1400,7 +1419,7 @@ Note: agent {label 'local'} is used to specify which node will execute the jenki
 
 Make sure to use Pipline project and name it whatever you want I have named it as borcelle_crm
 
-![Jenkins Project for borcelle CRM Configuration File](https://github.com/arpansahu/borcelle_crm/blob/master/borcelle_crm_jenkins_config.png?raw=true)
+![Jenkins Project for borcelle CRM Configuration File](/borcelle_crm_jenkins_config.png)
 
 In this above picture you can see credentials right? you can add your github credentials
 from Manage Jenkins on home Page --> Manage Credentials
