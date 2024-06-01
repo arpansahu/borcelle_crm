@@ -28,13 +28,13 @@ This project provides following features
 
 -Deployed on Heroku
 
-1. Used Heroku Postgres 
+1. Used Postgres 
 2. Used Daphene
-3. Used REDIS-CLOUD Sever, provided by heroku add-ons
+3. Used REDIS
 
 -Deployed on AWS / Now in My Own Home Ubuntu Server LTS 22.0 / Hostinger VPS Server
 
-1. Used AWS EC2 Ubuntu 22.0 LTS
+1. Used Ubuntu 22.0 LTS
 2. Used Nginx as a Web Proxy Server
 3. Used Let's Encrypt Wildcard certificate 
 4. Used Acme-dns server for automating renewal of wildcard certificates
@@ -51,7 +51,9 @@ In the below image I will try to explain everything.
 
 ## Working:-
 
-1. When a user wants to take notes and want it to email-ed. Then from Django app we send 
+1. This is A Customer Relationship Management (CRM) system is designed to help businesses create, save, and manage their contacts efficiently. This includes maintaining a comprehensive database of customer and client information, tracking interactions, and managing customer relationships. The CRM system integrates with Mailjet to facilitate seamless email communication.
+
+2. When a contact will be emailed. Then from Django app we send 
     a request to Django View to create and Send a task to Redis/RabbitMQ broker. Then 
     broker will be passing this task to celery. Moreover, since while creating a task we 
     used celery results to save the progress in CELER_RESULT_BACKEND (django-db or redis or rabbitmq).
@@ -66,15 +68,14 @@ In the below image I will try to explain everything.
       to status of task it is notified to channel and if user is still connected to the channels, will
       be able to see the results in progress bar.
 
-2. When a user wants to Schedule an Email as Reminder then, Via Django Application View, a cron task is created and that is 
+3. When a user wants to Schedule an Email as Reminder then, Via Django Application View, a cron task is created and that is 
    assigned to Celery Beat and as soon as the scheduled time arrived it pass task to broker, and then it is finally assigned 
    to celery which finishes the task and at the end of the task, a message is passed through channels to frontend to notify about the completion of task.
 
-3. Admin can broadcast a Notification to all users using django channels and cron tab, admin can schedule the notification 
+4. Admin can broadcast a Notification to all users using django channels and cron tab, admin can schedule the notification 
    at a particular time and then as soon as time arrives Celery Beat transfers task to Broker, and then it passes to Celery Workers.
    Moreover, the task focuses on sending notification through channels and web sockets so that users connected to particular channels 
    will be able to see the notifications.
-
 
 ## What is Python ?
 Python is a high-level, general-purpose programming language. Its design philosophy emphasizes code readability with the
@@ -183,6 +184,120 @@ RabbitMQ is an open-source message-broker software that originally implemented t
 [![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=Jenkins&logoColor=white)](https://www.jenkins.io/)
 [![AWS](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
 [![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)]()
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)]()
+
+## Integrating AWS S3 Bucket 
+
+Install two python packages
+``` 
+pip install boto3
+pip install django-storages
+```
+
+create a new file named ```storage_backends.py``` with this code inside it.
+
+``` 
+from django.conf import settings
+from storages.backends.s3boto3 import S3Boto3Storage
+
+
+class StaticStorage(S3Boto3Storage):
+    location = settings.AWS_STATIC_LOCATION
+
+
+class PublicMediaStorage(S3Boto3Storage):
+    location = settings.AWS_PUBLIC_MEDIA_LOCATION
+    file_overwrite = False
+
+
+class PrivateMediaStorage(S3Boto3Storage):
+    location = 'private'
+    default_acl = 'private'
+    file_overwrite = False
+    custom_domain = False
+
+```
+
+Change settings.py static files and media files settings | Now I have added support for BlackBlaze Static Storage also which also based on AWS S3 protocols 
+
+``` 
+if not DEBUG:
+    BUCKET_TYPE = config('BUCKET_TYPE')
+
+    if BUCKET_TYPE == 'AWS':
+
+        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+        AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_S3_OBJECT_PARAMETERS = {
+            'CacheControl': 'max-age=86400'
+        }
+        AWS_LOCATION = 'static'
+        AWS_QUERYSTRING_AUTH = False
+        AWS_HEADERS = {
+            'Access-Control-Allow-Origin': '*',
+        }
+        # s3 static settings
+        AWS_STATIC_LOCATION = 'portfolio/borcelle_crm/static'
+        STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
+        STATICFILES_STORAGE = 'borcelle_crm.storage_backends.StaticStorage'
+        # s3 public media settings
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/borcelle_crm/media'
+        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
+        DEFAULT_FILE_STORAGE = 'borcelle_crm.storage_backends.PublicMediaStorage'
+        # s3 private media settings
+        PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
+        PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
+
+    elif BUCKET_TYPE == 'BLACKBLAZE':
+
+        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+        AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME')
+
+        AWS_S3_ENDPOINT = f's3.{AWS_S3_REGION_NAME}.backblazeb2.com'
+        AWS_S3_ENDPOINT_URL = f'https://{AWS_S3_ENDPOINT}'
+        
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_S3_OBJECT_PARAMETERS = {
+            'CacheControl': 'max-age=86400',
+        }
+
+        AWS_LOCATION = 'static'
+        AWS_QUERYSTRING_AUTH = False
+        AWS_HEADERS = {
+            'Access-Control-Allow-Origin': '*',
+        }
+        # s3 static settings
+        AWS_STATIC_LOCATION = 'portfolio/borcelle_crm/static'
+        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_STATIC_LOCATION}/'
+        STATICFILES_STORAGE = 'borcelle_crm.storage_backends.StaticStorage'
+        # s3 public media settings
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/borcelle_crm/media'
+        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_PUBLIC_MEDIA_LOCATION}/'
+        DEFAULT_FILE_STORAGE = 'borcelle_crm.storage_backends.PublicMediaStorage'
+        # s3 private media settings
+        PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
+        PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
+
+
+else:
+    # Static files (CSS, JavaScript, Images)
+    # https://docs.djangoproject.com/en/3.2/howto/static-files/
+
+    STATIC_URL = '/static/'
+
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
+```
+
+run below command ```python manage.py collectstatic```  and you are good to go
 
 ## Demo
 
@@ -360,7 +475,7 @@ Push Heroku App
     git push heroku master
 ```
 
-Configure Heroku App
+Configure Heroku App Env Variables
 ```bash
   heroku config:set GITHUB_USERNAME=joesmith
 
@@ -428,24 +543,41 @@ to
 CELERY_BROKER_URL=config("REDISCLOUD_URL")
 ```
 
+
 ## Deployment on AWS EC2/ Home Server Ubuntu 22.0 LTS/ Hostinger VPS Server
 Previously This project was hosted on Heroku, but so I started hosting this and all other projects in a 
 Single EC2 Machine, which costed me a lot, so now I have shifted all the projects into my own Home Server with 
-Ubuntu 22.0 LTS Server. The problem with home server was it also required constant electricity and a ubuntu machine
-along with excellent internet connection which was not possible for a long time since i do not live in a good location.
-So i again shifted to Hostinger VPS Server which was affordable and also good for hosting my all the projects in it.
+Ubuntu 22.0 LTS Server, except for portfolio project at https://www.arpansahu.me along with Nginx 
 
 
-There is a nginx server and arpansahu.me portfolio
-Nginx forward https://borcelle-crm.arpansahu.me/ to Server 
+Now there is EC2 server running with a nginx server and arpansahu.me portfolio
+Nginx forward https://arpansahu.me/ to Home Server 
 
 Multiple Projects are running inside dockers so all projects are dockerized.
 You can refer to all projects on https://www.arpansahu.me/projects
 
 Every project have different port on which its running predefined inside Dockerfile and docker-compose.yml
 
-![EC2 and Home Server along with Nginx Arrangement](https://github.com/arpansahu/borcelle_crm/blob/master/ec2_and_home_server.png?raw=true)
+![EC2 and Home Server along with Nginx, Docker and Jenkins Arrangement](/ec2_and_home_server.png)
 
+Note: Update as of Aug 2023, I have decided to make some changes to my lifestyle, and from now i will be constantly on the go
+      from my past experience with running free EC2 server for arpansahu.me and nginx in it and then using another home server
+      with all the other projects hosted, my experience was
+      
+      1. Downtime due to Broadband Service Provider Issues
+      2. Downtime due to Weather Sometimes
+      3. Downtime due to Machine Breakdown
+      4. Downtime due to Power Cuts (even though i had a inverted with battery setup for my room)
+      5. Remotely it would be harder to fix these problems 
+
+  and due to all these reasons i decided to shift all the projects to single EC2 Server, at first i was using t2.medium which costs more than 40$ a month 
+  then i switched to t2.small and it only costs you 15$ and if we take pre paid plans prices can be slashed much further. 
+
+  Then again i shifted to Hostinger VPS which was more cost friendly then EC2 Server. on Jan 2024
+
+Now My project arrangements looks something similar to this
+
+![EC2 Sever along with Nginx, Docker and Jenkins Arrangement](/One%20Server%20Configuration%20for%20arpanahuone.png)
 
 ### Step 1: Dockerizing
 
@@ -1275,7 +1407,7 @@ from Manage Jenkins on home Page --> Manage Credentials
 
 and add your GitHub credentials from there
 
-* Add a .env file to you project using following command
+* Add a .env file to you project using following command (This step is no more required stage('Dependencies'))
 
     ```
     sudo vi  /var/lib/jenkins/workspace/borcelle_crm/.env
