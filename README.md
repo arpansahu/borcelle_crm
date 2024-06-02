@@ -315,7 +315,7 @@ password: showmecode
 
 Installing Pre requisites
 ```bash
-  pip install -r requirements.txt
+  pip install -r requirements.txt 
 ```
 
 Create .env File
@@ -433,11 +433,6 @@ Comment Channel Layers Setting for Heroku on settings.py
         },
     },
   }
-```
-
-Run Server
-```bash
-  python manage.py runserver
 ```
 
 Run Celery (in a different terminal)
@@ -801,7 +796,7 @@ Now It's time to enable HTTPS for this server
     ```
     
     It will be asking for domain name then you can enter your base domain 
-    I have generated ssl for borcelle-crm.arpansahu.me
+    I have generated ssl for arpansahu.me
     
     Then a few questions will be asked by them answer them all and done your ssl certificate will be geerated
     
@@ -1227,6 +1222,7 @@ server {
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 }
+```
 
 ### Step 4: CI/CD using Jenkins
 
@@ -1466,7 +1462,7 @@ Now you are good to go.
 [![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=Jenkins&logoColor=white)](https://www.jenkins.io/)
 [![AWS](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
 [![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)]()
-
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)]()
 
 ## Environment Variables
 
