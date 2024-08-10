@@ -148,6 +148,7 @@ LOGIN_REDIRECT_URL = "/"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
+
 if not DEBUG:
     BUCKET_TYPE = config('BUCKET_TYPE')
 
@@ -167,23 +168,23 @@ if not DEBUG:
             'Access-Control-Allow-Origin': '*',
         }
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/borcelle_crm/static'
+        AWS_STATIC_LOCATION = 'portfolio/brocelle_crm/static'
         STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'borcelle_crm.storage_backends.StaticStorage'
+        STATICFILES_STORAGE = 'brocelle_crm.storage_backends.StaticStorage'
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/borcelle_crm/media'
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/brocelle_crm/media'
         MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'borcelle_crm.storage_backends.PublicMediaStorage'
+        DEFAULT_FILE_STORAGE = 'brocelle_crm.storage_backends.PublicMediaStorage'
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
-        PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
+        PRIVATE_MEDIA_LOCATION = 'portfolio/brocelle_crm/private'
+        PRIVATE_FILE_STORAGE = 'brocelle_crm.storage_backends.PrivateMediaStorage'
 
     elif BUCKET_TYPE == 'BLACKBLAZE':
 
         AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
         AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
-        AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME')
+        AWS_S3_REGION_NAME = 'us-east-005'
 
         AWS_S3_ENDPOINT = f's3.{AWS_S3_REGION_NAME}.backblazeb2.com'
         AWS_S3_ENDPOINT_URL = f'https://{AWS_S3_ENDPOINT}'
@@ -199,17 +200,46 @@ if not DEBUG:
             'Access-Control-Allow-Origin': '*',
         }
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/borcelle_crm/static'
+        AWS_STATIC_LOCATION = 'portfolio/brocelle_crm/static'
         STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'borcelle_crm.storage_backends.StaticStorage'
+        STATICFILES_STORAGE = 'brocelle_crm.storage_backends.StaticStorage'
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/borcelle_crm/media'
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/brocelle_crm/media'
         MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'borcelle_crm.storage_backends.PublicMediaStorage'
+        DEFAULT_FILE_STORAGE = 'brocelle_crm.storage_backends.PublicMediaStorage'
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
-        PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
+        PRIVATE_MEDIA_LOCATION = 'portfolio/brocelle_crm/private'
+        PRIVATE_FILE_STORAGE = 'brocelle_crm.storage_backends.PrivateMediaStorage'
 
+    elif BUCKET_TYPE == 'MINIO':
+        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+        AWS_S3_REGION_NAME = 'us-east-1'  # MinIO doesn't require this, but boto3 does
+        AWS_S3_ENDPOINT_URL = 'https://minio.arpansahu.me'
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_S3_OBJECT_PARAMETERS = {
+            'CacheControl': 'max-age=86400',
+        }
+        AWS_LOCATION = 'static'
+        AWS_QUERYSTRING_AUTH = False
+        AWS_HEADERS = {
+            'Access-Control-Allow-Origin': '*',
+        }
+
+        # s3 static settings
+        AWS_STATIC_LOCATION = 'portfolio/brocelle_crm/static'
+        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_STATIC_LOCATION}/'
+        STATICFILES_STORAGE = 'brocelle_crm.storage_backends.StaticStorage'
+
+        # s3 public media settings
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/brocelle_crm/media'
+        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_PUBLIC_MEDIA_LOCATION}/'
+        DEFAULT_FILE_STORAGE = 'brocelle_crm.storage_backends.PublicMediaStorage'
+
+        # s3 private media settings
+        PRIVATE_MEDIA_LOCATION = 'portfolio/brocelle_crm/private'
+        PRIVATE_FILE_STORAGE = 'brocelle_crm.storage_backends.PrivateMediaStorage'
 
 else:
     # Static files (CSS, JavaScript, Images)
@@ -219,8 +249,8 @@ else:
 
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
 
 # CELERY STUFF
@@ -248,6 +278,7 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 MAIL_JET_API_KEY = config('MAIL_JET_API_KEY')
 MAIL_JET_API_SECRET = config('MAIL_JET_API_SECRET')
 MAIL_JET_EMAIL_ADDRESS = config('MAIL_JET_EMAIL_ADDRESS')
+
 try:
     import channels
 except ImportError:
@@ -279,9 +310,18 @@ else:
 
 
 #Caching
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": config('REDISCLOUD_URL'),
+if not DEBUG:
+    CHANNEL_LAYERS = {
+        'default': {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        }
     }
-}
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [(config('REDISCLOUD_URL'))],
+            },
+        },
+    }
