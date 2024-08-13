@@ -60,3 +60,4 @@ socialauth
 **/migrations/**
 
 venv
+.venv

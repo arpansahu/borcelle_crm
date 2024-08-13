@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'django_celery_results',
     'send_email_app',
     'notifications_app',
-    'manager'
+    'manager',
+    'check_service_health',
 ]
 
 MIDDLEWARE = [
@@ -168,16 +169,16 @@ if not DEBUG:
             'Access-Control-Allow-Origin': '*',
         }
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/brocelle_crm/static'
+        AWS_STATIC_LOCATION = 'portfolio/borcelle_crm/static'
         STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'brocelle_crm.storage_backends.StaticStorage'
+        STATICFILES_STORAGE = 'borcelle_crm.storage_backends.StaticStorage'
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/brocelle_crm/media'
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/borcelle_crm/media'
         MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'brocelle_crm.storage_backends.PublicMediaStorage'
+        DEFAULT_FILE_STORAGE = 'borcelle_crm.storage_backends.PublicMediaStorage'
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/brocelle_crm/private'
-        PRIVATE_FILE_STORAGE = 'brocelle_crm.storage_backends.PrivateMediaStorage'
+        PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
+        PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
 
     elif BUCKET_TYPE == 'BLACKBLAZE':
 
@@ -200,16 +201,16 @@ if not DEBUG:
             'Access-Control-Allow-Origin': '*',
         }
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/brocelle_crm/static'
+        AWS_STATIC_LOCATION = 'portfolio/borcelle_crm/static'
         STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'brocelle_crm.storage_backends.StaticStorage'
+        STATICFILES_STORAGE = 'borcelle_crm.storage_backends.StaticStorage'
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/brocelle_crm/media'
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/borcelle_crm/media'
         MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'brocelle_crm.storage_backends.PublicMediaStorage'
+        DEFAULT_FILE_STORAGE = 'borcelle_crm.storage_backends.PublicMediaStorage'
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/brocelle_crm/private'
-        PRIVATE_FILE_STORAGE = 'brocelle_crm.storage_backends.PrivateMediaStorage'
+        PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
+        PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
 
     elif BUCKET_TYPE == 'MINIO':
         AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
@@ -228,18 +229,20 @@ if not DEBUG:
         }
 
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/brocelle_crm/static'
+        AWS_STATIC_LOCATION = 'portfolio/borcelle_crm/static'
         STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'brocelle_crm.storage_backends.StaticStorage'
+        STATICFILES_STORAGE = 'borcelle_crm.storage_backends.StaticStorage'
 
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/brocelle_crm/media'
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/borcelle_crm/media'
         MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'brocelle_crm.storage_backends.PublicMediaStorage'
+        DEFAULT_FILE_STORAGE = 'borcelle_crm.storage_backends.PublicMediaStorage'
 
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/brocelle_crm/private'
-        PRIVATE_FILE_STORAGE = 'brocelle_crm.storage_backends.PrivateMediaStorage'
+        PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
+        PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
+
+    
 
 else:
     # Static files (CSS, JavaScript, Images)
@@ -255,9 +258,10 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
 
 # CELERY STUFF
 # CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_BROKER_URL = config("RABBITMQ_URL")
-# CELERY_RESULT_BACKEND = config("REDISCLOUD_URL")
 # CELERY_RESULT_BACKEND = 'django-db'
+
+CELERY_BROKER_URL = config("RABBITMQ_URL")
+CELERY_RESULT_BACKEND = config("REDISCLOUD_URL")
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
