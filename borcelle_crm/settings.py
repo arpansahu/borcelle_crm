@@ -255,7 +255,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
 
 # CELERY STUFF
 # CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_BROKER_URL = config("REDISCLOUD_URL")
+CELERY_BROKER_URL = config("RABBITMQ_URL")
 # CELERY_RESULT_BACKEND = config("REDISCLOUD_URL")
 # CELERY_RESULT_BACKEND = 'django-db'
 CELERY_ACCEPT_CONTENT = ['application/json']
