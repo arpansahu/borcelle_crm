@@ -41,8 +41,8 @@ to check if its running or not
 Use these CELERY settings
 
 ``` 
-CELERY_BROKER_URL = config("RABBITMQ_URL")
-CELERY_RESULT_BACKEND = config("REDISCLOUD_URL")
+CELERY_BROKER_URL = config("RABBIT_MQ_URL")
+CELERY_RESULT_BACKEND = config("REDIS_CLOUD_URL")
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -70,7 +70,7 @@ from decouple import config
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'borcelle_crm.settings')
 
-redis_url = config("REDISCLOUD_URL")
+redis_url = config("REDIS_CLOUD_URL")
 
 app = Celery('borcelle_crm', broker=redis_url, backend=redis_url, include=['tasks.tasks'])
 
@@ -112,7 +112,7 @@ Use these CACHE settings
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': config('REDISCLOUD_URL'),
+        'LOCATION': config('REDIS_CLOUD_URL'),
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
@@ -134,7 +134,7 @@ else:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": [(config('REDISCLOUD_URL'))],
+                "hosts": [(config('REDIS_CLOUD_URL'))],
             },
         },
     }

@@ -21,15 +21,24 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# ============================ENV VARIABLES=====================================
 SECRET_KEY = config('SECRET_KEY')
+DEBUG = config('DEBUG', cast=bool, default=False)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(' ')
+
 DOMAIN = config('DOMAIN')
 PROTOCOL = config('PROTOCOL')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', cast=bool, default=False)
+REDIS_CLOUD_URL = config('REDIS_CLOUD_URL')
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
+AWS_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(' ')
+DATABASE_URL = config('DATABASE_URL')
+RABBIT_MQ_URL = config("RABBIT_MQ_URL")
+
+# ===============================================================================
+
 
 
 # Application definition
@@ -104,7 +113,8 @@ WSGI_APPLICATION = 'borcelle_crm.wsgi.application'
 import dj_database_url
 # DATABASES['default'] =  dj_database_url.config()
 #updated
-DATABASES = {'default': dj_database_url.config(default=config('DATABASE_URL'))}
+
+DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -155,9 +165,9 @@ if not DEBUG:
 
     if BUCKET_TYPE == 'AWS':
 
-        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+        AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
+        AWS_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
         AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
         AWS_DEFAULT_ACL = 'public-read'
         AWS_S3_OBJECT_PARAMETERS = {
@@ -182,9 +192,9 @@ if not DEBUG:
 
     elif BUCKET_TYPE == 'BLACKBLAZE':
 
-        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+        AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
+        AWS_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
         AWS_S3_REGION_NAME = 'us-east-005'
 
         AWS_S3_ENDPOINT = f's3.{AWS_S3_REGION_NAME}.backblazeb2.com'
@@ -213,9 +223,9 @@ if not DEBUG:
         PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
 
     elif BUCKET_TYPE == 'MINIO':
-        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+        AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
+        AWS_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
         AWS_S3_REGION_NAME = 'us-east-1'  # MinIO doesn't require this, but boto3 does
         AWS_S3_ENDPOINT_URL = 'https://minio.arpansahu.me'
         AWS_DEFAULT_ACL = 'public-read'
@@ -241,9 +251,6 @@ if not DEBUG:
         # s3 private media settings
         PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
         PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
-
-    
-
 else:
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -260,8 +267,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
 # CELERY_BROKER_URL = 'redis://localhost:6379'
 # CELERY_RESULT_BACKEND = 'django-db'
 
-CELERY_BROKER_URL = config("RABBITMQ_URL")
-CELERY_RESULT_BACKEND = config("REDISCLOUD_URL")
+CELERY_BROKER_URL = RABBIT_MQ_URL
+CELERY_RESULT_BACKEND = REDIS_CLOUD_URL
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -298,7 +305,7 @@ else:
             # This example is assuming you use redis, in which case `channels_redis` is another dependency.
             'BACKEND': 'channels_redis.core.RedisChannelLayer',
             'CONFIG': {
-                "hosts": [config("REDISCLOUD_URL") ],
+                "hosts": [REDIS_CLOUD_URL],
             },
         },
     }
@@ -325,7 +332,7 @@ else:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": [(config('REDISCLOUD_URL'))],
+                "hosts": [(REDIS_CLOUD_URL)],
             },
         },
     }
