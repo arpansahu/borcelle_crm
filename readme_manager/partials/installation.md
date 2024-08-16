@@ -109,7 +109,6 @@ Run Server
 Use these CACHE settings
 
 ```python
-#Caching
 if not DEBUG:
     CHANNEL_LAYERS = {
         'default': {
