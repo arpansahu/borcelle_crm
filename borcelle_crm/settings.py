@@ -29,12 +29,12 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(' ')
 DOMAIN = config('DOMAIN')
 PROTOCOL = config('PROTOCOL')
 
-REDIS_CLOUD_URL = config('REDIS_CLOUD_URL')
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
 AWS_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
 
 DATABASE_URL = config('DATABASE_URL')
+REDIS_CLOUD_URL = config('REDIS_CLOUD_URL')
 RABBIT_MQ_URL = config("RABBIT_MQ_URL")
 
 # ===============================================================================
