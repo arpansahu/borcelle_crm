@@ -30,8 +30,8 @@ DOMAIN = config('DOMAIN')
 PROTOCOL = config('PROTOCOL')
 
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
-AWS_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
 BUCKET_TYPE = config('BUCKET_TYPE')
 
 DATABASE_URL = config('DATABASE_URL')
@@ -41,6 +41,8 @@ RABBIT_MQ_URL = config("RABBIT_MQ_URL")
 MAIL_JET_API_KEY = config('MAIL_JET_API_KEY')
 MAIL_JET_API_SECRET = config('MAIL_JET_API_SECRET')
 MAIL_JET_EMAIL_ADDRESS = config('MAIL_JET_EMAIL_ADDRESS')
+
+PROJECT_NAME = 'borcelle_crm'
 # ===============================================================================
 
 
@@ -168,10 +170,6 @@ if not DEBUG:
     BUCKET_TYPE = BUCKET_TYPE
 
     if BUCKET_TYPE == 'AWS':
-
-        AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
-        AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
-        AWS_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
         AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
         AWS_DEFAULT_ACL = 'public-read'
         AWS_S3_OBJECT_PARAMETERS = {
@@ -183,22 +181,18 @@ if not DEBUG:
             'Access-Control-Allow-Origin': '*',
         }
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/borcelle_crm/static'
+        AWS_STATIC_LOCATION = f'portfolio/{PROJECT_NAME}/static'
         STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'borcelle_crm.storage_backends.StaticStorage'
+        STATICFILES_STORAGE = f'{PROJECT_NAME}.storage_backends.StaticStorage'
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/borcelle_crm/media'
+        AWS_PUBLIC_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/media'
         MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'borcelle_crm.storage_backends.PublicMediaStorage'
+        DEFAULT_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PublicMediaStorage'
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
-        PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
+        PRIVATE_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/private'
+        PRIVATE_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PrivateMediaStorage'
 
     elif BUCKET_TYPE == 'BLACKBLAZE':
-
-        AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
-        AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
-        AWS_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
         AWS_S3_REGION_NAME = 'us-east-005'
 
         AWS_S3_ENDPOINT = f's3.{AWS_S3_REGION_NAME}.backblazeb2.com'
@@ -215,21 +209,18 @@ if not DEBUG:
             'Access-Control-Allow-Origin': '*',
         }
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/borcelle_crm/static'
+        AWS_STATIC_LOCATION = f'portfolio/{PROJECT_NAME}/static'
         STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'borcelle_crm.storage_backends.StaticStorage'
+        STATICFILES_STORAGE = f'{PROJECT_NAME}.storage_backends.StaticStorage'
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/borcelle_crm/media'
+        AWS_PUBLIC_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/media'
         MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'borcelle_crm.storage_backends.PublicMediaStorage'
+        DEFAULT_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PublicMediaStorage'
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
-        PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
+        PRIVATE_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/private'
+        PRIVATE_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PrivateMediaStorage'
 
     elif BUCKET_TYPE == 'MINIO':
-        AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
-        AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
-        AWS_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
         AWS_S3_REGION_NAME = 'us-east-1'  # MinIO doesn't require this, but boto3 does
         AWS_S3_ENDPOINT_URL = 'https://minio.arpansahu.me'
         AWS_DEFAULT_ACL = 'public-read'
@@ -243,14 +234,14 @@ if not DEBUG:
         }
 
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/borcelle_crm/static'
+        AWS_STATIC_LOCATION = f'portfolio/{PROJECT_NAME}/static'
         STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'borcelle_crm.storage_backends.StaticStorage'
+        STATICFILES_STORAGE = f'{PROJECT_NAME}.storage_backends.StaticStorage'
 
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/borcelle_crm/media'
+        AWS_PUBLIC_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/media'
         MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'borcelle_crm.storage_backends.PublicMediaStorage'
+        DEFAULT_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PublicMediaStorage'
 
         # s3 private media settings
         PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
@@ -294,46 +285,47 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 try:
     import channels
 except ImportError:
-    pass
+    raise ImportError("Channels must be installed for this project to work.")
 else:
     INSTALLED_APPS.insert(0, 'channels')
     INSTALLED_APPS.append('celery_progress.websockets')
 
     ASGI_APPLICATION = 'borcelle_crm.routing.application'
 
-    CHANNEL_LAYERS = {
-        'default': {
-            # This example is assuming you use redis, in which case `channels_redis` is another dependency.
-            'BACKEND': 'channels_redis.core.RedisChannelLayer',
-            'CONFIG': {
-                "hosts": [REDIS_CLOUD_URL],
+    # Remove this redundant CHANNEL_LAYERS block if it's not needed.
+    if not DEBUG:
+        CHANNEL_LAYERS = {
+            'default': {
+                "BACKEND": "channels.layers.InMemoryChannelLayer",
+            }
+        }
+    else:
+        CHANNEL_LAYERS = {
+            "default": {
+                "BACKEND": "channels_redis.core.RedisChannelLayer",
+                "CONFIG": {
+                    "hosts": [(REDIS_CLOUD_URL)],
+                },
             },
-        },
-    }
-
-    # CHANNEL_LAYERS = {
-    #     'default': {
-    #         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-    #         'CONFIG': {
-    #             "hosts": [('127.0.0.1', 6379)],
-    #         },
-    #     },
-    # }
+        }
 
 
-#Caching
+# Caching
 if not DEBUG:
-    CHANNEL_LAYERS = {
+    CACHES = {
         'default': {
-            "BACKEND": "channels.layers.InMemoryChannelLayer",
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': REDIS_CLOUD_URL,
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            },
+            'KEY_PREFIX': PROJECT_NAME
         }
     }
 else:
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [(REDIS_CLOUD_URL)],
-            },
-        },
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
     }
