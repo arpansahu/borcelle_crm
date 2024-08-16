@@ -309,21 +309,23 @@ Use these CACHE settings
 
 ```python
 if not DEBUG:
-    CHANNEL_LAYERS = {
+    CACHES = {
         'default': {
-            "BACKEND": "channels.layers.InMemoryChannelLayer",
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': REDIS_CLOUD_URL,
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            },
+            'KEY_PREFIX': PROJECT_NAME
         }
     }
 else:
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [(REDIS_CLOUD_URL)],
-            },
-        },
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
     }
-
 ```
 
 Use these Channels Settings
@@ -340,7 +342,7 @@ else:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": [(config('REDIS_CLOUD_URL'))],
+                "hosts": [(REDIS_CLOUD_URL)],
             },
         },
     }
