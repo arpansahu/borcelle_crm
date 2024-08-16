@@ -32,11 +32,15 @@ PROTOCOL = config('PROTOCOL')
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
 AWS_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
+BUCKET_TYPE = config('BUCKET_TYPE')
 
 DATABASE_URL = config('DATABASE_URL')
 REDIS_CLOUD_URL = config('REDIS_CLOUD_URL')
 RABBIT_MQ_URL = config("RABBIT_MQ_URL")
 
+MAIL_JET_API_KEY = config('MAIL_JET_API_KEY')
+MAIL_JET_API_SECRET = config('MAIL_JET_API_SECRET')
+MAIL_JET_EMAIL_ADDRESS = config('MAIL_JET_EMAIL_ADDRESS')
 # ===============================================================================
 
 
@@ -161,7 +165,7 @@ LOGIN_REDIRECT_URL = "/"
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 if not DEBUG:
-    BUCKET_TYPE = config('BUCKET_TYPE')
+    BUCKET_TYPE = BUCKET_TYPE
 
     if BUCKET_TYPE == 'AWS':
 
@@ -286,9 +290,6 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
 
-MAIL_JET_API_KEY = config('MAIL_JET_API_KEY')
-MAIL_JET_API_SECRET = config('MAIL_JET_API_SECRET')
-MAIL_JET_EMAIL_ADDRESS = config('MAIL_JET_EMAIL_ADDRESS')
 
 try:
     import channels
