@@ -2774,6 +2774,7 @@ pipeline {
         ENV_PROJECT_NAME = "borcelle_crm"
         DOCKER_PORT = "8014"
         PROJECT_NAME_WITH_DASH = "borcelle-crm"
+        SERVER_NAME= "borcelle-crm.arpansahu.me"
     }
     stages {
         stage('Initialize') {
@@ -2812,38 +2813,33 @@ pipeline {
 
                         sh """
                         sudo tee ${NGINX_CONF} > /dev/null <<EOF
-                        test content
+                        server {
+                            listen 80;
+                            server_name ${SERVER_NAME};
+
+                            if (\$scheme = http) {
+                                return 301 https://\$server_name\$request_uri;
+                            }
+
+                            location / {
+                                proxy_pass http://0.0.0.0:${DOCKER_PORT};
+                                proxy_set_header Host \$host;
+                                proxy_set_header X-Forwarded-Proto \$scheme;
+
+                                proxy_http_version 1.1;
+                                proxy_set_header Upgrade \$http_upgrade;
+                                proxy_set_header Connection "upgrade";
+                            }
+
+                            listen 443 ssl; # managed by Certbot
+                            ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
+                            ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+                            include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+                            ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+                        }
                         EOF
                         """
 
-                        // sh """
-                        // sudo tee ${NGINX_CONF} > /dev/null <<EOF
-                        // server {
-                        //     listen 80;
-                        //     server_name ${SERVER_NAME};
-
-                        //     if (\$scheme = http) {
-                        //         return 301 https://\$server_name\$request_uri;
-                        //     }
-
-                        //     location / {
-                        //         proxy_pass http://0.0.0.0:${DOCKER_PORT};
-                        //         proxy_set_header Host \$host;
-                        //         proxy_set_header X-Forwarded-Proto \$scheme;
-
-                        //         proxy_http_version 1.1;
-                        //         proxy_set_header Upgrade \$http_upgrade;
-                        //         proxy_set_header Connection "upgrade";
-                        //     }
-
-                        //     listen 443 ssl; # managed by Certbot
-                        //     ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
-                        //     ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
-                        //     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-                        //     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-                        // }
-                        // EOF
-                        // """
                         echo "Nginx configuration file created."
                     } else {
                         echo "Nginx configuration file already exists."
