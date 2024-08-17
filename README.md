@@ -2819,12 +2819,12 @@ pipeline {
                         sh "sudo sed -i 's|DOCKER_PORT|${DOCKER_PORT}|g' ${NGINX_CONF}"
 
                         echo "Nginx configuration file created."
+
+                        // Ensure Nginx is aware of the new configuration
+                        sh "sudo ln -sf ${NGINX_CONF} /etc/nginx/sites-enabled/"
                     } else {
                         echo "Nginx configuration file already exists."
                     }
-
-                    // Ensure Nginx is aware of the new configuration
-                    sh "sudo ln -sf ${NGINX_CONF} /etc/nginx/sites-enabled/"
                 }
             }
         }
