@@ -48,7 +48,7 @@ pipeline {
                     
                     if (configExists == 'not exists') {
                         echo "Nginx configuration file does not exist. Creating it now..."
-                        touch ${NGINX_CONF}
+                        sh "touch ${NGINX_CONF}"
                         sh "test -f ${NGINX_CONF} && echo 'exists' || echo 'not exists'"
 
                         sh """
