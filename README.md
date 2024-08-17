@@ -2817,17 +2817,17 @@ pipeline {
                             listen 80;
                             server_name ${SERVER_NAME};
 
-                            if (\$scheme = http) {
-                                return 301 https://\$server_name\$request_uri;
+                            if (\\\$scheme = http) {
+                                return 301 https://\\\$server_name\\\$request_uri;
                             }
 
                             location / {
                                 proxy_pass http://0.0.0.0:${DOCKER_PORT};
-                                proxy_set_header Host \$host;
-                                proxy_set_header X-Forwarded-Proto \$scheme;
+                                proxy_set_header Host \\\$host;
+                                proxy_set_header X-Forwarded-Proto \\\$scheme;
 
                                 proxy_http_version 1.1;
-                                proxy_set_header Upgrade \$http_upgrade;
+                                proxy_set_header Upgrade \\\$http_upgrade;
                                 proxy_set_header Connection "upgrade";
                             }
 
@@ -2836,8 +2836,7 @@ pipeline {
                             ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
                             include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
                             ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-                        }
-                        EOF
+                        }EOF
                         """
 
                         echo "Nginx configuration file created."
