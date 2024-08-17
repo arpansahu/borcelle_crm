@@ -1727,6 +1727,11 @@ spec:
                 secretKeyRef:
                   name: borcelle-crm-secret
                   key: MAIL_JET_API_SECRET
+            - name: MAIL_JET_EMAIL_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: borcelle-crm-secret
+                  key: MAIL_JET_EMAIL_ADDRESS
             - name: DOMAIN
               valueFrom:
                 secretKeyRef:
