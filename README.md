@@ -2807,16 +2807,16 @@ pipeline {
                 script {
                     // Check if the Nginx configuration file exists
                     def configExists = sh(script: "test -f ${NGINX_CONF} && echo 'exists' || echo 'not exists'", returnStdout: true).trim()
-                    
+
                     if (configExists == 'not exists') {
                         echo "Nginx configuration file does not exist. Creating it now..."
 
-                        // Create or overwrite the NGINX_CONF file with the content of nginx.conf
-                        sh "sudo cat nginx.conf > ${NGINX_CONF}"
+                        // Create or overwrite the NGINX_CONF file with the content of nginx.conf using sudo tee
+                        sh "sudo cat nginx.conf | sudo tee ${NGINX_CONF} > /dev/null"
 
                         // Replace placeholders in the configuration file
-                        sh "sudo sed -i 's|\\${SERVER_NAME}|${SERVER_NAME}|g' ${NGINX_CONF}"
-                        sh "sudo sed -i 's|\\${DOCKER_PORT}|${DOCKER_PORT}|g' ${NGINX_CONF}"
+                        sh "sudo sed -i 's|SERVER_NAME|${SERVER_NAME}|g' ${NGINX_CONF}"
+                        sh "sudo sed -i 's|DOCKER_PORT|${DOCKER_PORT}|g' ${NGINX_CONF}"
 
                         echo "Nginx configuration file created."
                     } else {
