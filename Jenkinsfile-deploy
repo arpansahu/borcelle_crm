@@ -48,8 +48,11 @@ pipeline {
                     
                     if (configExists == 'not exists') {
                         echo "Nginx configuration file does not exist. Creating it now..."
+                        touch ${NGINX_CONF}
+                        sh "test -f ${NGINX_CONF} && echo 'exists' || echo 'not exists'"
+
                         sh """
-                        sudo tee /etc/nginx/sites-available/borcelle-crm > /dev/null <<EOF
+                        sudo tee ${NGINX_CONF} > /dev/null <<EOF
                         server {
                             listen 80;
                             server_name ${SERVER_NAME};
