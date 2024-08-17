@@ -67,18 +67,6 @@ pipeline {
                 }
             }
         }
-        stage('Extract Port from Dockerfile') {
-            steps {
-                script {
-                    env.EXPOSED_PORT = sh(script: "grep '^EXPOSE' Dockerfile | awk '{print \$2}'", returnStdout: true).trim()
-                    if (!env.EXPOSED_PORT) {
-                        error "No EXPOSE directive found in Dockerfile"
-                    } else {
-                        echo "Exposed port found in Dockerfile: ${env.EXPOSED_PORT}"
-                    }
-                }
-            }
-        }
         stage('Deploy') {
             when {
                 expression { params.DEPLOY }
