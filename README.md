@@ -1225,7 +1225,7 @@ RUN pip3 install -r requirements.txt
 
 EXPOSE 8014
 
-CMD "python manage.py collectstatic --noinput && daphne borcelle_crm.asgi:application -b 0.0.0.0 --port 8014 & celery -A borcelle_crm.celery worker -l info & celery -A borcelle_crm beat -l INFO"
+CMD bash -c "python manage.py collectstatic --noinput && daphne borcelle_crm.asgi:application -b 0.0.0.0 --port 8014 & celery -A borcelle_crm.celery worker -l info & celery -A borcelle_crm beat -l INFO"
 ```
 
 Create a file named docker-compose.yml and add following lines in it
@@ -1700,8 +1700,6 @@ spec:
           ports:
             - containerPort: 8014
               name: daphne
-          command: ["/bin/sh", "-c"]
-          args: ["python manage.py collectstatic --noinput && daphne borcelle_crm.asgi:application -b 0.0.0.0 --port 8014 & celery -A borcelle_crm.celery worker -l info & celery -A borcelle_crm beat -l INFO; while true; do sleep 1000; done"]
 ```
 
 3. Create a service.yaml file and fill it with the below contents.
