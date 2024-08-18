@@ -85,7 +85,7 @@ pipeline {
                     
                     // Execute the curl command to retrieve the JSON response
                     def buildInfoJson = sh(script: """
-                        curl -u arpansahu:Kesar302@jenkins https://jenkins.arpansahu.me/job/arpansahu_dot_me_build/lastBuild/api/json
+                        curl -u arpansahu:Kesar302@jenkins ${api_url}
                     """, returnStdout: true).trim()
 
                     // Log the raw JSON response for debugging
