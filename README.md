@@ -1694,82 +1694,9 @@ spec:
       containers:
         - image: harbor.arpansahu.me/library/borcelle_crm:latest
           name: borcelle-crm
-          env:
-            - name: SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: SECRET_KEY
-            - name: DEBUG
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: DEBUG
-            - name: ALLOWED_HOSTS
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: ALLOWED_HOSTS
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: AWS_ACCESS_KEY_ID
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: AWS_SECRET_ACCESS_KEY
-            - name: AWS_STORAGE_BUCKET_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: AWS_STORAGE_BUCKET_NAME
-            - name: BUCKET_TYPE
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: BUCKET_TYPE
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: DATABASE_URL
-            - name: REDIS_CLOUD_URL
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: REDIS_CLOUD_URL
-            - name: RABBIT_MQ_URL
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: RABBIT_MQ_URL
-            - name: MAIL_JET_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: MAIL_JET_API_KEY
-            - name: MAIL_JET_API_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: MAIL_JET_API_SECRET
-            - name: MAIL_JET_EMAIL_ADDRESS
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: MAIL_JET_EMAIL_ADDRESS
-            - name: DOMAIN
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: DOMAIN
-            - name: PROTOCOL
-              valueFrom:
-                secretKeyRef:
-                  name: borcelle-crm-secret
-                  key: PROTOCOL
+          envFrom:
+            - secretRef:
+                name: borcelle-crm-secret
           ports:
             - containerPort: 8014
               name: daphne
@@ -2803,6 +2730,8 @@ pipeline {
         DOCKER_PORT = "8014"
         PROJECT_NAME_WITH_DASH = "borcelle-crm"
         SERVER_NAME= "borcelle-crm.arpansahu.me"
+        BUILD_PROJECT_NAME = "borcelle_crm_build"
+        JENKINS_DOMAIN = "jenkins.arpansahu.me"
     }
     stages {
         stage('Initialize') {
@@ -2853,6 +2782,39 @@ pipeline {
                     } else {
                         echo "Nginx configuration file already exists."
                     }
+                }
+            }
+        }
+        stage('Retrieve Image Tag from Another Job') {
+            when {
+                expression { params.DEPLOY && params.DEPLOY_TYPE == 'kubernetes' }
+            }
+            steps {
+                script {
+                    echo "Retrieve image tag from ${BUILD_PROJECT_NAME}"
+
+                    // Construct the API URL for the latest build
+                    def api_url = "https://${JENKINS_DOMAIN}/job/${BUILD_PROJECT_NAME}/lastSuccessfulBuild/api/json"
+
+                    // Log the API URL for debugging purposes
+                    echo "Hitting API URL: ${api_url}"
+                    
+                    // Execute the curl command to retrieve the JSON response
+                    def buildInfoJson = sh(script: """
+                        curl -u arpansahu:Kesar302@jenkins https://jenkins.arpansahu.me/job/arpansahu_dot_me_build/lastBuild/api/json
+                    """, returnStdout: true).trim()
+
+                    // Log the raw JSON response for debugging
+                    echo "Raw JSON response: ${buildInfoJson}"
+                    
+                    def imageTag = sh(script: """
+                        echo '${buildInfoJson}' | grep -oP '"number":\\s*\\K\\d+' | head -n 1
+                    """, returnStdout: true).trim()
+
+                    echo "Retrieved image tag (build number): ${imageTag}"
+
+                    // Replace the placeholder in the deployment YAML
+                    sh "sed -i 's|:latest|:${imageTag}|g' ${WORKSPACE}/deployment.yaml"
                 }
             }
         }
@@ -2929,11 +2891,11 @@ pipeline {
                             """
 
                             // Delete the existing service and deployment
-                            sh """
-                            kubectl delete service ${PROJECT_NAME_WITH_DASH}-service || true
-                            kubectl scale deployment ${PROJECT_NAME_WITH_DASH}-app --replicas=0 || true
-                            kubectl delete deployment ${PROJECT_NAME_WITH_DASH}-app || true
-                            """
+                            // sh """
+                            // kubectl delete service ${PROJECT_NAME_WITH_DASH}-service || true
+                            // kubectl scale deployment ${PROJECT_NAME_WITH_DASH}-app --replicas=0 || true
+                            // kubectl delete deployment ${PROJECT_NAME_WITH_DASH}-app || true
+                            // """
 
                             // Deploy to Kubernetes
                             sh """
@@ -3016,6 +2978,7 @@ pipeline {
     post {
         success {
             script {
+                // Retrieve the latest commit message
                 if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
                     sh """curl -s \
                     -X POST \
