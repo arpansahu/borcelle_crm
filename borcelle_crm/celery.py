@@ -3,6 +3,8 @@ import os
 from celery import Celery
 from celery.schedules import crontab
 from decouple import config
+from celery_progress.websockets import routing
+from notifications_app.routing import websocket_urlpatterns
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'borcelle_crm.settings')
@@ -18,11 +20,12 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Celery Beat Settings
 app.conf.beat_schedule = {
     'send-mail-every-day-at-8': {
-        'task': 'send_email_app.tasks.send_mail_func',
+        'task': 'send_email_app.tasks.web_socket_send_mail_task',
         'schedule': crontab(hour=0, minute=38),
         # 'args' : (2,)
     }
 }
+
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
 

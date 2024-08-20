@@ -14,8 +14,6 @@ from manager.models import Message
 mailjet = Client(auth=(settings.MAIL_JET_API_KEY, settings.MAIL_JET_API_SECRET), version='v3.1')
 
 
-
-
 @shared_task(bind=True)
 def send_mail_task_with_schedule(self, emails, headline, content, message):
     for email_no in range(len(emails)):

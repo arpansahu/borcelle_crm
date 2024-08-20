@@ -45,11 +45,10 @@ MAIL_JET_EMAIL_ADDRESS = config('MAIL_JET_EMAIL_ADDRESS')
 PROJECT_NAME = 'borcelle_crm'
 # ===============================================================================
 
-
-
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -98,7 +97,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'borcelle_crm.wsgi.application'
+# WSGI_APPLICATION = 'borcelle_crm.wsgi.application'
+ASGI_APPLICATION = 'borcelle_crm.asgi.application'
+
 
 
 # Database
@@ -282,35 +283,7 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # EMAIL_USE_TLS = True
 
 
-try:
-    import channels
-except ImportError:
-    raise ImportError("Channels must be installed for this project to work.")
-else:
-    INSTALLED_APPS.insert(0, 'channels')
-    INSTALLED_APPS.append('celery_progress.websockets')
-
-    ASGI_APPLICATION = 'borcelle_crm.routing.application'
-
-    # Remove this redundant CHANNEL_LAYERS block if it's not needed.
-    if not DEBUG:
-        CHANNEL_LAYERS = {
-            'default': {
-                "BACKEND": "channels.layers.InMemoryChannelLayer",
-            }
-        }
-    else:
-        CHANNEL_LAYERS = {
-            "default": {
-                "BACKEND": "channels_redis.core.RedisChannelLayer",
-                "CONFIG": {
-                    "hosts": [(REDIS_CLOUD_URL)],
-                },
-            },
-        }
-
-
-# Caching
+#Caching
 if not DEBUG:
     CACHES = {
         'default': {
@@ -328,4 +301,20 @@ else:
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'unique-snowflake',
         }
+    }
+
+if not DEBUG:
+    CHANNEL_LAYERS = {
+        'default': {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        }
+    }
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [(config('REDIS_CLOUD_URL'))],
+            },
+        },
     }
