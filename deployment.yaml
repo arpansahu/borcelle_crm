@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: borcelle-crm-app
+  labels:
+    app: borcelle-crm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: borcelle-crm
+  template:
+    metadata:
+      labels:
+        app: borcelle-crm
+    spec:
+      imagePullSecrets:
+        - name: harbor-registry-secret
+      containers:
+        - image: harbor.arpansahu.me/library/borcelle_crm:latest
+          name: borcelle-crm
+          envFrom:
+            - secretRef:
+                name: borcelle-crm-secret
+          ports:
+            - containerPort: 8014
+              name: uvicorn
+            - containerPort: 8052
+              name: celery-flower
+  revisionHistoryLimit: 0

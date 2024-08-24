@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: borcelle-crm-mac-app
+  labels:
+    app: borcelle-crm-mac
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: borcelle-crm-mac
+  template:
+    metadata:
+      labels:
+        app: borcelle-crm-mac
+    spec:
+      imagePullSecrets:
+        - name: harbor-registry-secret
+      containers:
+        - image: harbor.arpansahu.me/library/borcelle_crm_mac:latest
+          name: borcelle-crm-mac
+          envFrom:
+            - secretRef:
+                name: borcelle-crm-secret
+          ports:
+            - containerPort: 8014
+              name: uvicorn
+  revisionHistoryLimit: 0
