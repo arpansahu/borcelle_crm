@@ -1,8 +1,8 @@
-celery -A borcelle_crm.celery worker -l info
+celery -A borcelle_crm.celery worker -l info -n borcelle_crm_worker
 celery -A borcelle_crm beat -l INFO
 uvicorn borcelle_crm.asgi:application -b 0.0.0.0 --port 8014
 celery -A borcelle_crm flower --port=8052
 
-uvicorn borcelle_crm.asgi:application --host 0.0.0.0 --port 8014 & celery -A borcelle_crm.celery worker -l info & celery -A borcelle_crm beat -l INFO & celery -A borcelle_crm flower --port=8052
+uvicorn borcelle_crm.asgi:application --host 0.0.0.0 --port 8014 & celery -A borcelle_crm.celery worker -l info -n borcelle_crm_worker & celery -A borcelle_crm beat -l INFO & celery -A borcelle_crm flower --port=8052
 
 Best Practices of Celery https://betterprogramming.pub/python-celery-best-practices-ae182730bb81
