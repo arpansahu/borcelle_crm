@@ -7,7 +7,7 @@ from celery import Celery, states
 from celery.exceptions import Ignore
 import asyncio
 
-@shared_task(bind=True)
+@shared_task(bind=True, name='borcelle_crm.notifications.broadcast_notification')
 def broadcast_notification(self, data):
     print(data)
     try:

@@ -13,10 +13,7 @@ from manager.models import Message
 
 mailjet = Client(auth=(settings.MAIL_JET_API_KEY, settings.MAIL_JET_API_SECRET), version='v3.1')
 
-
-
-
-@shared_task(bind=True)
+@shared_task(bind=True, name='borcelle_crm.send_mail_app.send_mail_task_with_schedule')
 def send_mail_task_with_schedule(self, emails, headline, content, message):
     for email_no in range(len(emails)):
 
@@ -56,7 +53,7 @@ def send_mail_task_with_schedule(self, emails, headline, content, message):
     return "Done"
 
 
-@shared_task(bind=True)
+@shared_task(bind=True, name='borcelle_crm.send_mail_app.web_socket_send_mail_task')
 def web_socket_send_mail_task(self, emails, headline, content, message):
     progress_recorder = WebSocketProgressRecorder(self)
     for email_no in range(len(emails)):
