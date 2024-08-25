@@ -15,8 +15,10 @@
   <!-- Nucleo Icons -->
   <link href="{% static 'assets/css/nucleo-icons.css' %}" rel="stylesheet" />
   <link href="{% static 'assets/css/nucleo-svg.css' %}" rel="stylesheet" />
+  
   <!-- Font Awesome Icons -->
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="{% static 'js/fontawesome/all.js' %}"></script>
+
   <link href="{% static 'assets/css/nucleo-svg.css' %}" rel="stylesheet" />
   <!-- CSS Files -->
   <link id="pagestyle" href="{% static 'assets/css/soft-ui-dashboard.css' %}" rel="stylesheet" />
@@ -24,9 +26,10 @@
 
   <!-- Jquery/AJAX -->
   <script src="{% static 'js/jquery.js' %}"></script>
+
   <!-- Specific CSS goes HERE -->
   <link rel="stylesheet" href="https://unpkg.com/@trevoreyre/autocomplete-js/dist/style.css"/>
-
+  
   <script src="https://js.sentry-cdn.com/fb1d2388910b0cd4d52743572aae86fa.min.js" crossorigin="anonymous"></script>
   {% block stylesheets %}
     <style>
