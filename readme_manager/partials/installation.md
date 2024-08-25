@@ -105,14 +105,13 @@ Run Server
   uvicorn --host 0.0.0.0 -port [PROJECT_DOCKER_PORT] [JENKINS PROJECT NAME].asgi:application
 ```
 
+[STATIC_FILES]
 
 [CACHE]
 
 [CHANNELS]
 
 [SENTRY]
-
-[STATIC_FILES]
 
 ## Custom Django Management Commands
 
