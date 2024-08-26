@@ -14,6 +14,7 @@ This WhatsApp clone project provides a comprehensive chat application with vario
 8. **Kubernetes-native** Kubernetes support also available.
 9. **CI/CD Pipeline:** Continuous integration and deployment included using Jenkins.
 10. **Sentry Integrated:** Logging and Debugging Made Easy.
+11. **RabbitMQ integration:** Rabbit MQ Integration for Broker.
 
 ## Implemented CRM
     
