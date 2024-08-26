@@ -13,6 +13,7 @@ This WhatsApp clone project provides a comprehensive chat application with vario
 7. **Dockerized Project:** Fully containerized for easy deployment.
 8. **Kubernetes-native** Kubernetes support also available.
 9. **CI/CD Pipeline:** Continuous integration and deployment included using Jenkins.
+10. **Sentry Integrated:** Logging and Debugging Made Easy.
 
 ## Implemented CRM
     
