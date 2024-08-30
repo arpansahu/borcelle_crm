@@ -18,6 +18,7 @@ from django.urls import path, re_path, include
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
+import time
 
 from send_email_app.views import (
     ScheduleMail,
@@ -37,6 +38,13 @@ from manager.views import (
     search_phone, search_name, search_country_code, search_gst, search_email,
     ContactsCreateView, ContactsView, ContactDetailView, ContactsUpdateView, ContactsDeleteView
 )
+
+def trigger_error(request):
+    division_by_zero = 1 / 0
+
+def large_resource(request):
+   time.sleep(4)
+   return HttpResponse("Done!")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -85,6 +93,9 @@ urlpatterns = [
     path('reset/done/',
          auth_views.PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'),
          name='password_reset_complete'),
+    # sentry test view 
+    path('sentry-debug/', trigger_error),
+    path('large_resource/', large_resource)
 ]
 
 
