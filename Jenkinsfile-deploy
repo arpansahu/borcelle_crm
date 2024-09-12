@@ -15,6 +15,7 @@ pipeline {
         DOCKER_PORT = "8014"
         FLOWER_PORT = "8052"
         PROJECT_NAME_WITH_DASH = "borcelle-crm"
+        SERVER_NAME= "borcelle-crm.arpansahu.me"
         BUILD_PROJECT_NAME = "borcelle_crm_build"
         JENKINS_DOMAIN = "jenkins.arpansahu.me"
         SENTRY_ORG="arpansahu"
