@@ -15,9 +15,10 @@ RUN apt-get update && apt-get install -y supervisor
 COPY . .
 
 # Copy supervisord configuration file
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Expose necessary ports
-EXPOSE 8014 8052
+EXPOSE 8016 8054
 
 # Start supervisord to manage the processes
-CMD ["supervisord", "-c", "supervisord.conf"]
+CMD python manage.py collectstatic --noinput && supervisord -c /etc/supervisor/conf.d/supervisord.conf
