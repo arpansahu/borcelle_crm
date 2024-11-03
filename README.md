@@ -189,13 +189,20 @@ Its lightweight, flexible, and scalable nature makes RabbitMQ a popular choice f
 [![Web Sockets](https://img.shields.io/badge/WEBSOCKETS-1C47CB?style=for-the-badge&logo=socketdotio&logoColor=white)](https://websocket.org/)
 [![Celery](https://img.shields.io/badge/CELERY-37814A?style=for-the-badge&logo=celery&logoColor=white)](https://docs.celeryq.dev/en/stable/)
 [![Rancher](https://img.shields.io/badge/Rancher-0075A8?style=for-the-badge&logo=rancher&logoColor=white)](https://rancher.com/)
+[![Flower](https://img.shields.io/badge/Flower-FF8C00?style=for-the-badge&logo=flower&logoColor=white)](https://flower.readthedocs.io/en/latest/)
+
 
 ## Demo
 
 Available at: https://borcelle-crm.arpansahu.me
 
+Login Credentials:
+
+email: admin@arpansahu.me
+password: showmecode
+
 Flower Panel Available at: https://flower-borcelle-crm.arpansahu.me
-Login credentials required
+Login credentials required : Private
 
 ## License
 
@@ -4400,6 +4407,8 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 [![Web Sockets](https://img.shields.io/badge/WEBSOCKETS-1C47CB?style=for-the-badge&logo=socketdotio&logoColor=white)](https://websocket.org/)
 [![Celery](https://img.shields.io/badge/CELERY-37814A?style=for-the-badge&logo=celery&logoColor=white)](https://docs.celeryq.dev/en/stable/)
 [![Rancher](https://img.shields.io/badge/Rancher-0075A8?style=for-the-badge&logo=rancher&logoColor=white)](https://rancher.com/)
+[![Flower](https://img.shields.io/badge/Flower-FF8C00?style=for-the-badge&logo=flower&logoColor=white)](https://flower.readthedocs.io/en/latest/)
+
 
 ## Environment Variables
 
