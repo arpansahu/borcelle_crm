@@ -35,6 +35,17 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Setup Environment') {
+            steps {
+                script {
+                    // Copy .env file from Jenkins credentials to workspace
+                    withCredentials([file(credentialsId: 'borcelle_crm_env_file', variable: 'ENV_FILE')]) {
+                        sh 'cp $ENV_FILE ${WORKSPACE}/.env'
+                        echo "✅ Environment file loaded from Jenkins credentials"
+                    }
+                }
+            }
+        }
         stage('Setup Kubernetes Config') {
             when {
                 expression { return params.DEPLOY_TYPE == 'kubernetes' }

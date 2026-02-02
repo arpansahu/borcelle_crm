@@ -16,6 +16,17 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Setup Environment') {
+            steps {
+                script {
+                    // Copy .env file from Jenkins credentials to workspace
+                    withCredentials([file(credentialsId: 'borcelle_crm_env_file', variable: 'ENV_FILE')]) {
+                        sh 'cp $ENV_FILE ${WORKSPACE}/.env'
+                        echo "✅ Environment file loaded from Jenkins credentials"
+                    }
+                }
+            }
+        }
         stage('Check for Changes') {
             steps {
                 script {
@@ -24,6 +35,9 @@ pipeline {
                         BUILD_STATUS = 'BUILT'
                         currentBuild.description = "${currentBuild.fullDisplayName} Skipping Checks is True. Proceeding with build."
                     } else {
+                        // Initialize BUILD_STATUS
+                        BUILD_STATUS = 'NOT_BUILT'
+                        
                         // Get the current commit hash
                         def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
                         echo "Current commit: ${currentCommit}"
@@ -62,17 +76,7 @@ pipeline {
                         // Save the current commit hash to the file
                         writeFile(file: COMMIT_FILE, text: currentCommit)
                     }
-                }
-            }
-        }
-        stage('Dependencies') {
-            when {
-                expression { return BUILD_STATUS != 'NOT_BUILT' }
-            }
-            steps {
-                script {
-                    // Copy .env file to the workspace
-                    sh "sudo cp /root/projectenvs/${ENV_PROJECT_NAME}/.env ${env.WORKSPACE}/"
+
                 }
             }
         }
@@ -150,9 +154,6 @@ pipeline {
                             }
                     ]
                 }'"""
-
-                // Trigger borcelle_crm job only if the build is stable
-                build job: 'borcelle_crm', parameters: [booleanParam(name: 'DEPLOY', value: true)], wait: false
             }
         }
         failure {
