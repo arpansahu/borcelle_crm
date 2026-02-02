@@ -19,10 +19,10 @@ pipeline {
         stage('Setup Environment') {
             steps {
                 script {
-                    // Copy .env file from Jenkins credentials to workspace
-                    withCredentials([file(credentialsId: 'borcelle_crm_env_file', variable: 'ENV_FILE')]) {
-                        sh 'cp $ENV_FILE ${WORKSPACE}/.env'
-                        echo "✅ Environment file loaded from Jenkins credentials"
+                    echo "Loading environment variables from Jenkins credentials..."
+                    withCredentials([string(credentialsId: 'borcelle_crm_env_file', variable: 'ENV_CONTENT')]) {
+                        sh 'echo "$ENV_CONTENT" > .env'
+                        echo "✅ Environment file created successfully"
                     }
                 }
             }
