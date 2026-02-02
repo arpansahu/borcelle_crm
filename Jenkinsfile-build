@@ -4,7 +4,7 @@ pipeline {
         booleanParam(name: 'skip_checks', defaultValue: false, description: 'Skip the Check for Changes stage')
     }
     environment {
-        REGISTRY = "harbor.arpansahu.me"
+        REGISTRY = "harbor.arpansahu.space"
         REPOSITORY = "library/borcelle_crm"
         IMAGE_TAG = "${env.BUILD_ID}"
         COMMIT_FILE = "${env.WORKSPACE}/last_commit.txt"
