@@ -17,7 +17,7 @@ spec:
       imagePullSecrets:
         - name: harbor-registry-secret
       containers:
-        - image: harbor.arpansahu.me/library/borcelle_crm:latest
+        - image: harbor.arpansahu.space/library/borcelle_crm:latest
           name: borcelle-crm
           envFrom:
             - secretRef:

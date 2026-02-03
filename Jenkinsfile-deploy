@@ -1,7 +1,7 @@
 pipeline {
     agent { label 'local' }
     parameters {
-        booleanParam(name: 'DEPLOY', defaultValue: false, description: 'Skip the Check for Changes stage')
+        booleanParam(name: 'DEPLOY', defaultValue: true, description: 'Enable deployment')
         choice(name: 'DEPLOY_TYPE', choices: ['kubernetes', 'docker'], description: 'Select deployment type')
     }
     environment {
@@ -15,10 +15,10 @@ pipeline {
         DOCKER_PORT = "8014"
         FLOWER_PORT = "8052"
         PROJECT_NAME_WITH_DASH = "borcelle-crm"
-        SERVER_NAME= "borcelle-crm.arpansahu.me"
-        FLOWER_SERVER_NAME = "flower-borcelle-crm.arpansahu.me"
+        SERVER_NAME= "borcelle.arpansahu.space"
+        FLOWER_SERVER_NAME = "flower-borcelle.arpansahu.space"
         BUILD_PROJECT_NAME = "borcelle_crm_build"
-        JENKINS_DOMAIN = "jenkins.arpansahu.me"
+        JENKINS_DOMAIN = "jenkins.arpansahu.space"
         SENTRY_ORG="arpansahu"
         SENTRY_PROJECT="borcelle_crm"
     }
@@ -125,10 +125,10 @@ pipeline {
                     // Log the API URL for debugging purposes
                     echo "Hitting API URL: ${api_url}"
                     
-                    withCredentials([usernamePassword(credentialsId: 'fc364086-fb8b-4528-bc7f-1ef3f42b71c7', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASS')]) {
+                    withCredentials([usernamePassword(credentialsId: 'jenkins-admin-credentials', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_TOKEN')]) {
                         // Execute the curl command to retrieve the JSON response
-                        echo "usernameVariable: ${JENKINS_USER}, passwordVariable: ${JENKINS_PASS}"
-                        def buildInfoJson = sh(script: "curl -u ${JENKINS_USER}:${JENKINS_PASS} ${api_url}", returnStdout: true).trim()
+                        // echo "usernameVariable: ${JENKINS_USER}, passwordVariable: ${JENKINS_TOKEN}"
+                        def buildInfoJson = sh(script: "curl -u ${JENKINS_USER}:${JENKINS_TOKEN} ${api_url}", returnStdout: true).trim()
 
                         // Log the raw JSON response for debugging
                         echo "Raw JSON response: ${buildInfoJson}"
@@ -167,14 +167,24 @@ pipeline {
             steps {
                 script {
                     if (params.DEPLOY_TYPE == 'docker') {
-                                                
-                        // Copy the .env file to the workspace
-                        sh "sudo cp /root/projectenvs/${ENV_PROJECT_NAME}/.env ${env.WORKSPACE}/"
+                        
+                        // First decommission Kubernetes if running
+                        echo "Decommissioning Kubernetes deployment if exists..."
+                        sh """
+                            # Check if kubernetes deployment exists
+                            if kubectl get deployment ${PROJECT_NAME_WITH_DASH}-app 2>/dev/null; then
+                                echo "Found Kubernetes deployment. Scaling down..."
+                                kubectl scale deployment ${PROJECT_NAME_WITH_DASH}-app --replicas=0 || true
+                                echo "Kubernetes deployment scaled down"
+                            else
+                                echo "No Kubernetes deployment found"
+                            fi
+                        """
                         
                         // Deploy using Docker Compose
-                        sh 'docker-compose down'
-                        sh 'docker-compose pull'
-                        sh 'docker-compose up -d'
+                        sh 'docker compose down'
+                        sh 'docker compose pull'
+                        sh 'docker compose up -d'
 
                         // Wait for a few seconds to let the app start
                         sleep 60
@@ -185,36 +195,40 @@ pipeline {
                             error "Container ${ENV_PROJECT_NAME} is not running"
                         } else {
                             echo "Container ${ENV_PROJECT_NAME} is running"
-                            // Execute curl and scale down Kubernetes deployment if curl is successful
+                            // Update Nginx and verify
                             sh """
-                                # Fetch HTTP status code
-                                HTTP_STATUS=\$(curl -s -o /dev/null -w "%{http_code}" -L http://0.0.0.0:${DOCKER_PORT})
+                                # Fetch HTTP status code with proper Host header
+                                HTTP_STATUS=\$(curl -s -o /dev/null -w "%{http_code}" -H "Host: ${SERVER_NAME}" http://localhost:${DOCKER_PORT})
                                 echo "HTTP Status: \$HTTP_STATUS"
                                 
-                                # Update Nginx configuration if status code is 200 (OK)
-                                if [ "\$HTTP_STATUS" -eq 200 ]; then
+                                # Update Nginx configuration if status code is 200 or 302 (redirect is OK)
+                                if [ "\$HTTP_STATUS" -eq 200 ] || [ "\$HTTP_STATUS" -eq 302 ]; then
+                                    echo "✅ Docker service is healthy (HTTP \$HTTP_STATUS), updating Nginx..."
                                     sudo sed -i 's|proxy_pass .*;|proxy_pass http://0.0.0.0:${DOCKER_PORT};|' ${NGINX_CONF}
                                     sudo sed -i 's|proxy_pass .*;|proxy_pass http://0.0.0.0:${FLOWER_PORT};|' ${NGINX_CONF_FLOWER}
                                     sudo nginx -s reload
-                                    echo 'Nginx configuration updated and reloaded successfully.'
+                                    echo "✅ Nginx configuration updated and reloaded successfully"
                                 else
-                                    echo 'Service not available. Nginx configuration not updated.'
-                                fi
-
-                                # Scale down Kubernetes deployment if it exists and is running
-                                replicas=\$(kubectl get deployment ${PROJECT_NAME_WITH_DASH}-app -o=jsonpath='{.spec.replicas}') || true
-                                if [ "\$replicas" != "" ] && [ \$replicas -gt 0 ]; then
-                                    kubectl scale deployment ${PROJECT_NAME_WITH_DASH}-app --replicas=0
-                                    echo 'Kubernetes deployment scaled down successfully.'
-                                else
-                                    echo 'No running Kubernetes deployment to scale down.'
+                                    echo "❌ Service not available (HTTP \$HTTP_STATUS). Nginx configuration not updated."
+                                    exit 1
                                 fi
                             """
                         }
                     } else if (params.DEPLOY_TYPE == 'kubernetes') {
-                        // Copy the .env file to the workspace
-                        sh "sudo cp /root/projectenvs/${ENV_PROJECT_NAME}/.env ${env.WORKSPACE}/"
-
+                        
+                        // First decommission Docker Compose if running
+                        echo "Decommissioning Docker Compose services if running..."
+                        sh """
+                            # Check if docker compose services are running
+                            if docker compose ps | grep -q ${ENV_PROJECT_NAME}; then
+                                echo "Found Docker Compose services. Stopping them..."
+                                docker compose down || true
+                                echo "Docker Compose services stopped"
+                            else
+                                echo "No Docker Compose services found"
+                            fi
+                        """
+                        
                         // Check if the file is copied successfully
                         if (fileExists("${env.WORKSPACE}/.env")) {
                             echo ".env file copied successfully."
@@ -268,52 +282,66 @@ pipeline {
                             def clusterIP = sh(script: "kubectl get nodes -o=jsonpath='{.items[0].status.addresses[0].address}'", returnStdout: true).trim()
                             echo "Cluster IP: ${clusterIP}"
 
-                            // Verify if the service is accessible and delete the Docker container if accessible and update nginx configuration
+                            // Health check with retry logic (5 attempts with 2-minute waits)
                             sh """
-                                HTTP_STATUS=\$(curl -s -o /dev/null -w "%{http_code}" -L http://${clusterIP}:${nodePort})
-                                echo "HTTP Status: \$HTTP_STATUS"
+                                MAX_RETRIES=5
+                                RETRY_COUNT=0
+                                SUCCESS=false
+                                WAIT_TIME=120
                                 
-                                if [ "\$HTTP_STATUS" -eq 200 ]; then
-                                    echo "Service is reachable at http://${clusterIP}:${nodePort}"
-
-                                    echo "Updating Nginx configuration at ${NGINX_CONF}..."
-                                    sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}
-                                    sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePortFlower};|' ${NGINX_CONF_FLOWER}
+                                echo "Starting health check for http://${clusterIP}:${nodePort}"
+                                echo "Will retry \$MAX_RETRIES times with \$WAIT_TIME second waits"
+                                
+                                while [ \$RETRY_COUNT -lt \$MAX_RETRIES ]; do
+                                    RETRY_COUNT=\$((RETRY_COUNT+1))
+                                    echo "Attempt \$RETRY_COUNT/\$MAX_RETRIES..."
                                     
-                                    if [ \$? -ne 0 ]; then
-                                        echo "Failed to update Nginx configuration"
-                                        exit 1
-                                    fi
+                                    HTTP_STATUS=\$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 -L http://${clusterIP}:${nodePort} 2>/dev/null || echo "000")
+                                    echo "HTTP Status: \$HTTP_STATUS"
                                     
-                                    echo "Reloading Nginx..."
-                                    sudo nginx -s reload
-                                    
-                                    if [ \$? -ne 0 ]; then
-                                        echo "Failed to reload Nginx"
-                                        exit 1
-                                    fi
-                                    
-                                    echo "Nginx reloaded successfully"
-                                    
-                                    DOCKER_CONTAINER=\$(docker ps -q -f name=${ENV_PROJECT_NAME})
-                                    
-                                    if [ "\$DOCKER_CONTAINER" ]; then
-                                        echo "Docker container ${ENV_PROJECT_NAME} is running. Removing it..."
-                                        docker rm -f ${ENV_PROJECT_NAME}
-                                        
-                                        if [ \$? -ne 0 ]; then
-                                            echo "Failed to remove Docker container ${ENV_PROJECT_NAME}"
-                                            exit 1
-                                        fi
-                                        
+                                    if [ "\$HTTP_STATUS" = "200" ]; then
+                                        echo "✅ Service is reachable at http://${clusterIP}:${nodePort}"
+                                        SUCCESS=true
+                                        break
                                     else
-                                        echo "Docker container ${ENV_PROJECT_NAME} is not running. Skipping removal"
+                                        echo "❌ Service not ready (HTTP \$HTTP_STATUS)"
+                                        echo "Checking pod status..."
+                                        kubectl get pods -l app=${PROJECT_NAME_WITH_DASH} --no-headers | head -1
+                                        
+                                        if [ \$RETRY_COUNT -lt \$MAX_RETRIES ]; then
+                                            echo "⏳ Waiting \$WAIT_TIME seconds before retry..."
+                                            sleep \$WAIT_TIME
+                                        fi
                                     fi
-
-                                else
-                                    echo "Service is not reachable at http://${clusterIP}:${nodePort}. HTTP Status: \$HTTP_STATUS"
+                                done
+                                
+                                if [ "\$SUCCESS" = "false" ]; then
+                                    echo "ERROR: Service failed to become reachable after \$MAX_RETRIES attempts"
+                                    echo "Debugging information:"
+                                    kubectl get pods -l app=${PROJECT_NAME_WITH_DASH} || true
+                                    kubectl logs -l app=${PROJECT_NAME_WITH_DASH} --tail=30 || true
                                     exit 1
                                 fi
+                                
+                                # Update Nginx configuration
+                                echo "Updating Nginx configuration at ${NGINX_CONF}..."
+                                sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}
+                                sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePortFlower};|' ${NGINX_CONF_FLOWER}
+                                
+                                if [ \$? -ne 0 ]; then
+                                    echo "Failed to update Nginx configuration"
+                                    exit 1
+                                fi
+                                
+                                echo "Reloading Nginx..."
+                                sudo nginx -s reload
+                                
+                                if [ \$? -ne 0 ]; then
+                                    echo "Failed to reload Nginx"
+                                    exit 1
+                                fi
+                                
+                                echo "✅ Nginx reloaded successfully"
                             """
                         } else {
                             error ".env file not found in the workspace."
@@ -330,19 +358,23 @@ pipeline {
             steps {
                 script {
                     echo "Sentry Release ..."
+                    
+                    // Use Jenkins credentials for Sentry auth token
+                    withCredentials([string(credentialsId: 'sentry-auth-token', variable: 'SENTRY_AUTH_TOKEN')]) {
+                        sh """
+                            # Get the current git commit hash
+                            VERSION=\$(git rev-parse HEAD)
+                            
+                            echo "Creating Sentry release for version: \$VERSION"
 
-                    sh """
-                        # Get the current git commit hash
-                        VERSION=\$(git rev-parse HEAD)
+                            sentry-cli releases -o ${SENTRY_ORG} -p ${SENTRY_PROJECT} new \$VERSION
 
-                        sentry-cli releases -o ${SENTRY_ORG} -p ${SENTRY_PROJECT} new \$VERSION
-
-                        # Associate commits with the release
-                        sentry-cli releases -o ${SENTRY_ORG} -p ${SENTRY_PROJECT} set-commits --auto \$VERSION
-
-                        # Deploy the release (optional step for marking the release as deployed)
-                        sentry-cli releases -o ${SENTRY_ORG} -p ${SENTRY_PROJECT} deploys \$VERSION new -e production
-                    """
+                            # Deploy the release
+                            sentry-cli releases -o ${SENTRY_ORG} -p ${SENTRY_PROJECT} deploys \$VERSION new -e production
+                            
+                            echo "✅ Sentry release created successfully"
+                        """
+                    }
                 }
             }
         }
