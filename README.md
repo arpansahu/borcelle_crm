@@ -2314,7 +2314,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 EXPOSE 8016 8054
 
 # Start supervisord to manage the processes
-CMD python manage.py collectstatic --noinput && supervisord -c /etc/supervisor/conf.d/supervisord.conf
+CMD python manage.py migrate --noinput && python manage.py collectstatic --noinput && supervisord -c /etc/supervisor/conf.d/supervisord.conf
 
 ```
 
@@ -2331,8 +2331,8 @@ services:
     image: harbor.arpansahu.me/library/borcelle_crm:latest
     env_file: ./.env
     container_name: borcelle_crm
-    volumes:
-      - .:/app
+    # volumes:
+    #   - .:/app  # Only for local development, commented out for production deployment
     ports:
       - "8014:8014"
       - "8052:8052"
