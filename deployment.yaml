@@ -16,6 +16,13 @@ spec:
     spec:
       imagePullSecrets:
         - name: harbor-registry-secret
+      initContainers:
+        - name: migrate-db
+          image: harbor.arpansahu.space/library/borcelle_crm:latest
+          command: ['python', 'manage.py', 'migrate', '--noinput']
+          envFrom:
+            - secretRef:
+                name: borcelle-crm-secret
       containers:
         - image: harbor.arpansahu.space/library/borcelle_crm:latest
           name: borcelle-crm
