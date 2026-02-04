@@ -1,23 +1,23 @@
-server_tokens               off;
-access_log                  /var/log/nginx/supersecure.access.log;
-error_log                   /var/log/nginx/supersecure.error.log;
+# ================= SERVICE PROXY TEMPLATE =================
 
+# HTTP → HTTPS redirect
 server {
-    listen         80;
-    server_name    [DOMAIN_NAME];
-    # force https-redirects
-    if ($scheme = http) {
-        return 301 https://$server_name$request_uri;
-        }
+    listen 80;
+    listen [::]:80;
 
-    location / {
-         proxy_pass              http://{ip_of_home_server}:[PROJECT_DOCKER_PORT];
-         proxy_set_header        Host $host;
-         proxy_set_header        X-Forwarded-Proto $scheme;
+    server_name [DOMAIN_NAME];
+    return 301 https://$host$request_uri;
+}
 
-	 # WebSocket support
-         proxy_http_version 1.1;
-         proxy_set_header Upgrade $http_upgrade;
+# HTTPS reverse proxy
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name [DOMAIN_NAME];
+
+    # 🔐 Wildcard SSL (acme.sh + Namecheap DNS-01)
+    ssl_certificate     /etc/nginx/ssl/arpansahu.space/fullchain.pem;
          proxy_set_header Connection "upgrade";
     }
 
