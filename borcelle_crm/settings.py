@@ -198,6 +198,7 @@ if not DEBUG:
     # Static and Media File Storage Settings
     AWS_STATIC_LOCATION = f'portfolio/{PROJECT_NAME}/static'
     STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Temporary location for collectstatic
     
     AWS_PUBLIC_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/media'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
