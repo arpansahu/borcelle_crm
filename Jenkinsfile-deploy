@@ -39,7 +39,7 @@ pipeline {
             steps {
                 script {
                     echo "Loading environment variables from Jenkins credentials..."
-                    withCredentials([file(credentialsId: 'borcelle_crm_env', variable: 'ENV_FILE')]) {
+                    withCredentials([file(credentialsId: 'borcelle_crm_env_file', variable: 'ENV_FILE')]) {
                         sh "cp \$ENV_FILE .env"
                         echo "✅ Environment file created successfully"
                     }

@@ -24,7 +24,7 @@ pipeline {
         stage('Setup Environment') {
             steps {
                 script {
-                    withCredentials([file(credentialsId: 'borcelle_crm_env', variable: 'ENV_FILE')]) {
+                    withCredentials([file(credentialsId: 'borcelle_crm_env_file', variable: 'ENV_FILE')]) {
                         sh "cp \$ENV_FILE .env"
                         echo '.env file created successfully from credentials'
                     }
