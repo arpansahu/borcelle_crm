@@ -7,9 +7,9 @@ We provide security patches for the latest release of our project. Users are enc
 
 | Version       | Supported          |
 | ------------- | ------------------ |
-| Latest        | 1.0.0 |
-| Previous      |  |
-| Older versions |                |
+| Latest        | 2.0.0 |
+| Previous      | 1.0.0 |
+| Older versions | :x: |
 
 ## Reporting a Vulnerability
 
