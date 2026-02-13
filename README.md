@@ -179,7 +179,7 @@ Its lightweight, flexible, and scalable nature makes RabbitMQ a popular choice f
 [![Javascript](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E)](https://www.javascript.com/)
 [![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/docs/)
 [![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/docs/)
-[![RabbitMQ](https://img.shields.io/badge/rabbitmq-%23FF6600.svg?&style=for-the-badge&logo=rabbitmq&logoColor=white)(https://www.rabbitmq.com/)]
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)](https://www.rabbitmq.com/)
 [![Github](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://www.github.com/)
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Harbor](https://img.shields.io/badge/HARBOR-TEXT?style=for-the-badge&logo=harbor&logoColor=white&color=blue)](https://goharbor.io/)
@@ -195,6 +195,9 @@ Its lightweight, flexible, and scalable nature makes RabbitMQ a popular choice f
 [![Celery](https://img.shields.io/badge/CELERY-37814A?style=for-the-badge&logo=celery&logoColor=white)](https://docs.celeryq.dev/en/stable/)
 [![Rancher](https://img.shields.io/badge/Rancher-0075A8?style=for-the-badge&logo=rancher&logoColor=white)](https://rancher.com/)
 [![Flower](https://img.shields.io/badge/Flower-FF8C00?style=for-the-badge&logo=flower&logoColor=white)](https://flower.readthedocs.io/en/latest/)
+[![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)](https://docs.pytest.org/)
+[![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
+[![Daphne](https://img.shields.io/badge/Daphne-092E20?style=for-the-badge&logo=django&logoColor=white)](https://github.com/django/daphne)
 
 
 ## Demo
@@ -10844,7 +10847,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 [![Javascript](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E)](https://www.javascript.com/)
 [![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/docs/)
 [![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/docs/)
-[![RabbitMQ](https://img.shields.io/badge/rabbitmq-%23FF6600.svg?&style=for-the-badge&logo=rabbitmq&logoColor=white)(https://www.rabbitmq.com/)]
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)](https://www.rabbitmq.com/)
 [![Github](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://www.github.com/)
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Harbor](https://img.shields.io/badge/HARBOR-TEXT?style=for-the-badge&logo=harbor&logoColor=white&color=blue)](https://goharbor.io/)
@@ -10860,6 +10863,9 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 [![Celery](https://img.shields.io/badge/CELERY-37814A?style=for-the-badge&logo=celery&logoColor=white)](https://docs.celeryq.dev/en/stable/)
 [![Rancher](https://img.shields.io/badge/Rancher-0075A8?style=for-the-badge&logo=rancher&logoColor=white)](https://rancher.com/)
 [![Flower](https://img.shields.io/badge/Flower-FF8C00?style=for-the-badge&logo=flower&logoColor=white)](https://flower.readthedocs.io/en/latest/)
+[![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)](https://docs.pytest.org/)
+[![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
+[![Daphne](https://img.shields.io/badge/Daphne-092E20?style=for-the-badge&logo=django&logoColor=white)](https://github.com/django/daphne)
 
 
 ## Environment Variables
@@ -10869,6 +10875,8 @@ To run this project, you will need to add the following environment variables to
 SECRET_KEY=
 
 DEBUG=
+
+USE_S3=
 
 ALLOWED_HOSTS=
 
@@ -10894,8 +10902,6 @@ DATABASE_URL=
 
 REDIS_CLOUD_URL=
 
-RABBIT_MQ_URL=
-
 # SENTRY
 SENTRY_ENVIRONMENT=
 
@@ -10905,6 +10911,58 @@ SENTRY_DSH_URL=
 HARBOR_USERNAME=
 
 HARBOR_PASSWORD=
+
+HARBOR_URL=
+
+MY_EMAIL_ADDRESS=
+
+# Flower Basic Auth
+FLOWER_ADMIN_USERNAME=
+FLOWER_ADMIN_PASS=
+
+# RabbitMQ Configuration
+RABBITMQ_HOST=
+RABBITMQ_PORT=
+RABBITMQ_USER=
+RABBITMQ_PASSWORD=
+RABBITMQ_VHOST=
+RABBITMQ_MANAGEMENT_PORT=
+
+# Kafka Configuration  
+KAFKA_BOOTSTRAP_SERVERS=
+KAFKA_SECURITY_PROTOCOL=
+KAFKA_SASL_MECHANISM=
+KAFKA_SASL_USERNAME=
+KAFKA_SASL_PASSWORD=
+KAFKA_SSL_TRUSTSTORE_PASSWORD=
+KAFKA_SSL_KEYSTORE_PASSWORD=
+
+# Elasticsearch Configuration
+ELASTICSEARCH_HOST=
+ELASTICSEARCH_USER=
+ELASTICSEARCH_PASSWORD=
+ELASTICSEARCH_INDEX_PREFIX=
+
+# ==================== Social Authentication (OAuth) ====================
+# Google OAuth - https://console.developers.google.com/
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# GitHub OAuth - https://github.com/settings/developers
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+
+# Facebook OAuth - https://developers.facebook.com/apps/
+FACEBOOK_APP_ID=
+FACEBOOK_APP_SECRET=
+
+# Twitter/X OAuth - https://developer.twitter.com/en/portal/dashboard
+TWITTER_OAUTH2_CLIENT_ID=
+TWITTER_OAUTH2_CLIENT_SECRET=
+
+# LinkedIn OAuth - https://www.linkedin.com/developers/apps
+LINKEDIN_CLIENT_ID=
+LINKEDIN_CLIENT_SECRET=
 
 
 
