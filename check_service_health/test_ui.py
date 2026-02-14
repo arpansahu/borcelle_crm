@@ -29,15 +29,17 @@ def browser_context_args(browser_context_args):
 class TestPublicPages:
     """Test public pages that don't require authentication"""
     
-    def test_homepage_loads(self, page: Page):
-        """Test that the homepage loads successfully"""
+    def test_homepage_redirects_to_login(self, page: Page):
+        """Test that the homepage redirects to login when not authenticated"""
         page.goto(BASE_URL)
-        expect(page).to_have_title("Borcelle CRM", timeout=10000)
+        # Should redirect to login page
+        page.wait_for_url(f"{BASE_URL}/login/*", timeout=10000)
+        expect(page).to_have_title("Sign IN")
         
     def test_login_page_loads(self, page: Page):
         """Test that the login page loads and has correct elements"""
         page.goto(f"{BASE_URL}/login/")
-        expect(page).to_have_title("Borcelle CRM - Login")
+        expect(page).to_have_title("Sign IN")
         
         # Check for login form elements
         expect(page.locator('input[name="username"]')).to_be_visible()
@@ -47,12 +49,12 @@ class TestPublicPages:
     def test_register_page_loads(self, page: Page):
         """Test that the registration page loads"""
         page.goto(f"{BASE_URL}/register/")
-        expect(page).to_have_title("Borcelle CRM - Register")
+        expect(page).to_have_title("Sign UP")
         
-        # Check for registration form
+        # Check for registration form (uses password1 and password2 from UserCreationForm)
         expect(page.locator('input[name="email"]')).to_be_visible()
         expect(page.locator('input[name="username"]')).to_be_visible()
-        expect(page.locator('input[name="password"]')).to_be_visible()
+        expect(page.locator('input[name="password1"]')).to_be_visible()
 
 
 class TestAuthentication:
@@ -62,7 +64,8 @@ class TestAuthentication:
         """Test logging in with valid credentials"""
         page.goto(f"{BASE_URL}/login/")
         
-        page.fill('input[name="username"]', TEST_USER_USERNAME)
+        # Form field is 'username' but expects email value
+        page.fill('input[name="username"]', TEST_USER_EMAIL)
         page.fill('input[name="password"]', TEST_USER_PASSWORD)
         page.click('button[type="submit"]')
         
@@ -89,7 +92,8 @@ class TestAuthenticatedPages:
     def login(self, page: Page):
         """Login before each test in this class"""
         page.goto(f"{BASE_URL}/login/")
-        page.fill('input[name="username"]', TEST_USER_USERNAME)
+        # Form field is 'username' but expects email value
+        page.fill('input[name="username"]', TEST_USER_EMAIL)
         page.fill('input[name="password"]', TEST_USER_PASSWORD)
         page.click('button[type="submit"]')
         page.wait_for_url(f"{BASE_URL}/", timeout=10000)
@@ -101,13 +105,15 @@ class TestAuthenticatedPages:
         assert "Borcelle CRM" in page.title()
     
     def test_contacts_page_loads(self, page: Page):
-        """Test contacts page loads"""
-        page.goto(f"{BASE_URL}/contacts/")
-        expect(page).to_have_url(f"{BASE_URL}/contacts/")
+        """Test contacts page redirects to home (ContactsView redirects)"""
+        page.goto(f"{BASE_URL}/contact/")
+        # ContactsView redirects to home
+        page.wait_for_url(f"{BASE_URL}/", timeout=10000)
+        expect(page).to_have_url(f"{BASE_URL}/")
     
     def test_add_contact_page_loads(self, page: Page):
         """Test add contact page loads"""
-        page.goto(f"{BASE_URL}/contacts/add/")
+        page.goto(f"{BASE_URL}/contact/add/")
         
         # Check for form fields
         expect(page.locator('input[name="name"]')).to_be_visible()
