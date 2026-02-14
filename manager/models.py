@@ -15,6 +15,9 @@ class Contacts(AbstractBaseModel):
     email = models.EmailField(verbose_name="email", max_length=60)
     owner = models.ForeignKey(Account, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.name
+
 
 class Message(AbstractBaseModel):
     message = models.CharField(max_length=30000)

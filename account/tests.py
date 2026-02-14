@@ -39,7 +39,7 @@ class TestAccountModel:
     
     def test_user_str_representation(self, test_user):
         """Test the string representation of user"""
-        assert str(test_user) == test_user.username
+        assert str(test_user) == test_user.email
 
 
 @pytest.mark.django_db
