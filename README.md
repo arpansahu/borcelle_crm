@@ -10957,7 +10957,7 @@ HARBOR_USERNAME=
 
 HARBOR_PASSWORD=
 
-HARBOR_URL=harbor.arpansahu.me/library
+HARBOR_URL=harbor.arpansahu.space/library
 
 # ============================================
 # Flower Monitoring Basic Auth
