@@ -56,12 +56,12 @@ class TestAccountViews:
         """Test login page loads correctly"""
         response = client.get('/login/')
         assert response.status_code == 200
-        assert 'registration/login.html' in [t.name for t in response.templates]
+        assert 'account/login.html' in [t.name for t in response.templates]
     
     def test_login_with_valid_credentials(self, client, test_user, test_password):
         """Test login with valid credentials"""
         response = client.post('/login/', {
-            'username': test_user.username,
+            'username': test_user.email,  # Form field is 'username' but expects email value
             'password': test_password
         })
         # Should redirect after successful login

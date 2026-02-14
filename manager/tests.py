@@ -56,17 +56,17 @@ class TestManagerViews:
     
     def test_contacts_view_requires_login(self, client):
         """Test that contacts view requires authentication"""
-        response = client.get('/contacts/')
+        response = client.get('/contact/')
         assert response.status_code == 302
     
     def test_contacts_view_authenticated(self, authenticated_client):
         """Test contacts view for authenticated user"""
-        response = authenticated_client.get('/contacts/')
+        response = authenticated_client.get('/contact/')
         assert response.status_code == 200
     
     def test_contacts_create_view_authenticated(self, authenticated_client):
         """Test contact creation view"""
-        response = authenticated_client.get('/contacts/add/')
+        response = authenticated_client.get('/contact/add/')
         assert response.status_code == 200
     
     def test_create_contact_post(self, authenticated_client, test_user):
@@ -75,9 +75,11 @@ class TestManagerViews:
             'name': 'Test Contact',
             'email': 'testcontact@example.com',
             'phone': '9876543210',
-            'country_code': '+91'
+            'country_code': '+91',
+            'address': '123 Test Street',
+            'gst': ''
         }
-        response = authenticated_client.post('/contacts/add/', data)
+        response = authenticated_client.post('/contact/add/', data)
         # Should redirect after successful creation
         assert response.status_code in [200, 302]
         # Verify contact was created
@@ -94,7 +96,7 @@ class TestManagerViews:
             country_code='+1',
             phone='1234567890'
         )
-        response = authenticated_client.get(f'/contacts/{contact.id}/')
+        response = authenticated_client.get(f'/contact/{contact.id}/')
         assert response.status_code == 200
     
     def test_contact_update_view(self, authenticated_client, test_user):
@@ -108,7 +110,7 @@ class TestManagerViews:
             country_code='+1',
             phone='1234567890'
         )
-        response = authenticated_client.get(f'/contacts/update/{contact.id}/')
+        response = authenticated_client.get(f'/contact/{contact.id}/update')
         assert response.status_code == 200
     
     def test_contact_delete_view(self, authenticated_client, test_user):
@@ -122,7 +124,7 @@ class TestManagerViews:
             country_code='+1',
             phone='1234567890'
         )
-        response = authenticated_client.post(f'/contacts/delete/{contact.id}/')
+        response = authenticated_client.post(f'/contact/{contact.id}/delete')
         # Should redirect after deletion
         assert response.status_code in [200, 302]
         # Verify contact was deleted

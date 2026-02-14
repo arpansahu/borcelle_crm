@@ -15,9 +15,8 @@ def create_user(db, django_user_model, test_password):
     def make_user(**kwargs):
         kwargs.setdefault('username', 'testuser')
         kwargs.setdefault('email', 'testuser@example.com')
+        kwargs.setdefault('password', test_password)
         user = django_user_model.objects.create_user(**kwargs)
-        user.set_password(test_password)
-        user.save()
         return user
     return make_user
 
@@ -27,7 +26,7 @@ def auto_login_user(db, client, create_user, test_password):
     def make_auto_login(user=None):
         if user is None:
             user = create_user()
-        client.login(username=user.username, password=test_password)
+        client.login(username=user.email, password=test_password)
         return client, user
     return make_auto_login
 
@@ -39,5 +38,5 @@ def test_user(db, create_user):
 
 @pytest.fixture(scope='function')
 def authenticated_client(db, client, test_user, test_password):
-    client.login(username=test_user.username, password=test_password)
+    client.login(username=test_user.email, password=test_password)
     return client
