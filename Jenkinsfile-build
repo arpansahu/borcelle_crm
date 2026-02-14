@@ -108,6 +108,10 @@ pipeline {
                             mcr.microsoft.com/playwright/python:v1.40.0-jammy \
                             bash -c '
                                 set -e
+                                
+                                # Install build dependencies for packages that need compilation
+                                apt-get update -qq && apt-get install -y -qq gcc python3-dev
+                                
                                 pip install -q -r requirements.txt
                                 pip install -q pytest pytest-django pytest-playwright pytest-asyncio
                                 playwright install chromium
