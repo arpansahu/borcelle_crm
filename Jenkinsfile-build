@@ -187,12 +187,12 @@ else:
                     sh 'docker --version'
 
                     // Log the image details
-                    echo "Building Docker image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
+                    echo "Building Docker image: ${REPOSITORY}:${IMAGE_TAG}"
 
                     // Build the Docker image
                     sh """
-                    docker build -t ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} .
-                    docker tag ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} ${REGISTRY}/${REPOSITORY}:latest
+                    docker build -t ${REPOSITORY}:${IMAGE_TAG} .
+                    docker tag ${REPOSITORY}:${IMAGE_TAG} ${REPOSITORY}:latest
                     """
                 }
             }
