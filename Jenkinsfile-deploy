@@ -5,22 +5,8 @@ pipeline {
         choice(name: 'DEPLOY_TYPE', choices: ['kubernetes', 'docker'], description: 'Select deployment type')
     }
     environment {
-        REGISTRY = "harbor.arpansahu.space"
-        REPOSITORY = "library/borcelle_crm"
-        IMAGE_TAG = "latest"  // or use a specific tag if needed
+        // Environment variables will be loaded from .env file in Setup Environment stage
         KUBECONFIG = "${env.WORKSPACE}/kubeconfig"  // Set the KUBECONFIG environment variable
-        NGINX_CONF = "/etc/nginx/sites-available/borcelle-crm"
-        NGINX_CONF_FLOWER = "/etc/nginx/sites-available/flower-borcelle-crm"
-        ENV_PROJECT_NAME = "borcelle_crm"
-        DOCKER_PORT = "8014"
-        FLOWER_PORT = "8052"
-        PROJECT_NAME_WITH_DASH = "borcelle-crm"
-        SERVER_NAME= "borcelle.arpansahu.space"
-        FLOWER_SERVER_NAME = "flower-borcelle.arpansahu.space"
-        BUILD_PROJECT_NAME = "borcelle_crm_build"
-        JENKINS_DOMAIN = "jenkins.arpansahu.space"
-        SENTRY_ORG="arpansahu"
-        SENTRY_PROJECT="borcelle_crm"
     }
     stages {
         stage('Initialize') {
@@ -40,8 +26,48 @@ pipeline {
                 script {
                     echo "Loading environment variables from Jenkins credentials..."
                     withCredentials([file(credentialsId: 'borcelle_crm_env_file', variable: 'ENV_FILE')]) {
-                        sh "cp \$ENV_FILE .env"
-                        echo "✅ Environment file created successfully"
+                        // Use Jenkins API instead of shell commands to avoid permission issues
+                        def envContent = readFile(file: env.ENV_FILE)
+                        writeFile(file: '.env', text: envContent)
+                        echo '.env file created successfully from credentials'
+                        
+                        // Load environment variables from .env
+                        def envVars = sh(script: 'cat .env | grep -v "^#" | grep -v "^$" | xargs', returnStdout: true).trim()
+                        if (envVars) {
+                            envVars.split().each { envVar ->
+                                if (envVar.contains('=')) {
+                                    def parts = envVar.split('=', 2)
+                                    def key = parts[0]
+                                    def value = parts.length > 1 ? parts[1] : ''  // Null-safe check
+                                    if (key) {
+                                        env."${key}" = value
+                                    }
+                                }
+                            }
+                        }
+                        
+                        echo '✅ Environment variables loaded from .env'
+                        
+                        // Compute derived variables
+                        env.BUILD_PROJECT_NAME = "${env.ENV_PROJECT_NAME}_build"
+                        env.PROJECT_NAME_WITH_DASH = env.ENV_PROJECT_NAME.replace('_', '-')
+                        env.NGINX_CONF = "/etc/nginx/sites-available/${env.PROJECT_NAME_WITH_DASH}"
+                        env.NGINX_CONF_FLOWER = "/etc/nginx/sites-available/flower-${env.PROJECT_NAME_WITH_DASH}"
+                        env.REGISTRY = "${env.DOCKER_REGISTRY}/${env.DOCKER_REPOSITORY}"
+                        env.REPOSITORY = "${env.DOCKER_REGISTRY}/${env.DOCKER_REPOSITORY}/${env.DOCKER_IMAGE_NAME}"
+                        env.IMAGE_TAG = "latest"
+                        
+                        // Log computed values
+                        echo "Computed BUILD_PROJECT_NAME: ${env.BUILD_PROJECT_NAME}"
+                        echo "Computed PROJECT_NAME_WITH_DASH: ${env.PROJECT_NAME_WITH_DASH}"
+                        echo "Computed NGINX_CONF: ${env.NGINX_CONF}"
+                        echo "Computed NGINX_CONF_FLOWER: ${env.NGINX_CONF_FLOWER}"
+                        echo "Docker Image: ${env.REPOSITORY}:${env.IMAGE_TAG}"
+                        
+                        // Validate required variables
+                        if (!env.ENV_PROJECT_NAME || !env.SERVER_NAME) {
+                            error "Missing required deployment configuration in .env file"
+                        }
                     }
                 }
             }
@@ -175,8 +201,8 @@ pipeline {
                         echo "Retrieved image tag (build number): ${imageTag}"
 
 
-                        // Check if REGISTRY, REPOSITORY, and imageTag are all defined and not empty
-                        if (REGISTRY && REPOSITORY && imageTag) {
+                        // Check if REPOSITORY and imageTag are all defined and not empty
+                        if (env.REPOSITORY && imageTag) {
                             if (params.DEPLOY_TYPE == 'kubernetes') {
                                 // Replace the placeholder in the deployment YAML
                                 sh "sed -i 's|:latest|:${imageTag}|g' ${WORKSPACE}/deployment.yaml"
@@ -185,11 +211,11 @@ pipeline {
                             if (params.DEPLOY_TYPE == 'docker') {
                                 // Ensure the correct image tag is used in the docker-compose.yml
                                 sh """
-                                sed -i 's|image: .*|image: ${REGISTRY}/${REPOSITORY}:${imageTag}|' docker-compose.yml
+                                sed -i 's|image: .*|image: ${env.REPOSITORY}:${imageTag}|' docker-compose.yml
                                 """
                             }
                         } else {
-                            echo "One or more required variables (REGISTRY, REPOSITORY, imageTag) are not defined or empty. Skipping docker-compose.yml update."
+                            echo "One or more required variables (REPOSITORY, imageTag) are not defined or empty. Skipping deployment configuration update."
                         }
                     }
                 }

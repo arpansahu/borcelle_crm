@@ -10,9 +10,8 @@ pipeline {
     }
     
     environment {
-        REGISTRY = "harbor.arpansahu.space"
-        REPOSITORY = "library/borcelle_crm"
-        IMAGE_TAG = "${env.BUILD_ID}"
+        // Environment variables will be loaded from .env file in Setup Environment stage
+        // Keeping ENV_PROJECT_NAME here for reference only
         ENV_PROJECT_NAME = "borcelle_crm"
     }
     stages {
@@ -25,8 +24,44 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'borcelle_crm_env_file', variable: 'ENV_FILE')]) {
-                        sh "cp \$ENV_FILE .env"
+                        // Use Jenkins API instead of shell commands to avoid permission issues
+                        def envContent = readFile(file: env.ENV_FILE)
+                        writeFile(file: '.env', text: envContent)
                         echo '.env file created successfully from credentials'
+                        
+                        // Load environment variables from .env
+                        def envVars = sh(script: 'cat .env | grep -v "^#" | grep -v "^$" | xargs', returnStdout: true).trim()
+                        if (envVars) {
+                            envVars.split().each { envVar ->
+                                if (envVar.contains('=')) {
+                                    def parts = envVar.split('=', 2)
+                                    def key = parts[0]
+                                    def value = parts.length > 1 ? parts[1] : ''  // Null-safe check
+                                    if (key) {
+                                        env."${key}" = value
+                                    }
+                                }
+                            }
+                        }
+                        
+                        echo '✅ Environment variables loaded from .env'
+                        
+                        // Compute derived variables
+                        env.BUILD_PROJECT_NAME = "${env.ENV_PROJECT_NAME}_build"
+                        env.PROJECT_NAME_WITH_DASH = env.ENV_PROJECT_NAME.replace('_', '-')
+                        env.REGISTRY = "${env.DOCKER_REGISTRY}/${env.DOCKER_REPOSITORY}"
+                        env.REPOSITORY = "${env.DOCKER_REGISTRY}/${env.DOCKER_REPOSITORY}/${env.DOCKER_IMAGE_NAME}"
+                        env.IMAGE_TAG = "${env.BUILD_ID}"
+                        
+                        // Log computed values
+                        echo "Computed BUILD_PROJECT_NAME: ${env.BUILD_PROJECT_NAME}"
+                        echo "Computed PROJECT_NAME_WITH_DASH: ${env.PROJECT_NAME_WITH_DASH}"
+                        echo "Docker Image: ${env.REPOSITORY}:${env.IMAGE_TAG}"
+                        
+                        // Validate required variables
+                        if (!env.DOCKER_REGISTRY || !env.DOCKER_REPOSITORY || !env.DOCKER_IMAGE_NAME) {
+                            error "Missing required Docker registry configuration in .env file"
+                        }
                     }
                 }
             }
@@ -159,16 +194,16 @@ else:
             steps {
                 withCredentials([usernamePassword(credentialsId: 'harbor-credentials', passwordVariable: 'DOCKER_REGISTRY_PASSWORD', usernameVariable: 'DOCKER_REGISTRY_USERNAME')]) {
                     script {
-                        // Log in to Docker registry using environment variables without direct interpolation
-                        sh '''
-                        echo $DOCKER_REGISTRY_PASSWORD | docker login ${REGISTRY} -u $DOCKER_REGISTRY_USERNAME --password-stdin
-                        '''
+                        // Log in to Docker registry using environment variables
+                        sh """
+                        echo \$DOCKER_REGISTRY_PASSWORD | docker login ${env.DOCKER_REGISTRY} -u \$DOCKER_REGISTRY_USERNAME --password-stdin
+                        """
 
                         // Push the Docker image to the registry
-                        sh '''
-                        docker push ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
-                        docker push ${REGISTRY}/${REPOSITORY}:latest
-                        '''
+                        sh """
+                        docker push ${env.REPOSITORY}:${env.IMAGE_TAG}
+                        docker push ${env.REPOSITORY}:latest
+                        """
                     }
                 }
             }
@@ -178,25 +213,25 @@ else:
         success {
             script {
                 if (!currentBuild.description) {
-                    currentBuild.description = "Image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} built and pushed successfully"
+                    currentBuild.description = "Image: ${env.REPOSITORY}:${env.IMAGE_TAG} built and pushed successfully"
                 }
                 
                 // Send success notification email
-                sh """curl -s \
-                -X POST \
-                --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
-                https://api.mailjet.com/v3.1/send \
-                -H "Content-Type:application/json" \
+                sh """curl -s \\
+                -X POST \\
+                --user \$MAIL_JET_API_KEY:\$MAIL_JET_API_SECRET \\
+                https://api.mailjet.com/v3.1/send \\
+                -H "Content-Type:application/json" \\
                 -d '{
                     "Messages":[
                             {
                                     "From": {
-                                            "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                            "Email": "\$MAIL_JET_EMAIL_ADDRESS",
                                             "Name": "ArpanSahuOne Jenkins Notification"
                                     },
                                     "To": [
                                             {
-                                                    "Email": "$MY_EMAIL_ADDRESS",
+                                                    "Email": "\$MY_EMAIL_ADDRESS",
                                                     "Name": "Development Team"
                                             }
                                     ],
@@ -211,21 +246,21 @@ else:
         failure {
             script {
                 // Send failure notification email
-                sh """curl -s \
-                -X POST \
-                --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
-                https://api.mailjet.com/v3.1/send \
-                -H "Content-Type:application/json" \
+                sh """curl -s \\
+                -X POST \\
+                --user \$MAIL_JET_API_KEY:\$MAIL_JET_API_SECRET \\
+                https://api.mailjet.com/v3.1/send \\
+                -H "Content-Type:application/json" \\
                 -d '{
                     "Messages":[
                             {
                                     "From": {
-                                            "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                            "Email": "\$MAIL_JET_EMAIL_ADDRESS",
                                             "Name": "ArpanSahuOne Jenkins Notification"
                                     },
                                     "To": [
                                             {
-                                                    "Email": "$MY_EMAIL_ADDRESS",
+                                                    "Email": "\$MY_EMAIL_ADDRESS",
                                                     "Name": "Development Team"
                                             }
                                     ],

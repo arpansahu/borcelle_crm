@@ -5,12 +5,12 @@ services:
     build:  # This section will be used when running locally
       context: .
       dockerfile: Dockerfile
-    image: harbor.arpansahu.me/library/borcelle_crm:latest
+    image: ${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
     env_file: ./.env
-    container_name: borcelle_crm
+    container_name: ${ENV_PROJECT_NAME}
     # volumes:
     #   - .:/app  # Only for local development, commented out for production deployment
     ports:
-      - "8014:8014"
-      - "8052:8052"
+      - "${DOCKER_PORT}:${DOCKER_PORT}"
+      - "${FLOWER_PORT}:${FLOWER_PORT}"
     restart: unless-stopped

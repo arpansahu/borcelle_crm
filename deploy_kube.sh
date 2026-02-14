@@ -4,22 +4,33 @@
 if [ -f .env ]; then
     export $(grep -v '^#' .env | xargs)
 else
-    echo ".env file not found!"
+    echo "Error: .env file not found!"
     exit 1
 fi
 
-# Check if required environment variables are set
+# Validate required Docker registry variables
+if [ -z "$DOCKER_REGISTRY" ] || [ -z "$DOCKER_REPOSITORY" ] || \
+   [ -z "$DOCKER_IMAGE_NAME" ] || [ -z "$DOCKER_IMAGE_TAG" ]; then
+    echo "Error: Missing required Docker registry variables"
+    echo "Required: DOCKER_REGISTRY, DOCKER_REPOSITORY, DOCKER_IMAGE_NAME, DOCKER_IMAGE_TAG"
+    exit 1
+fi
+
+# Validate required Harbor credentials (legacy support)
 if [ -z "$HARBOR_USERNAME" ] || [ -z "$HARBOR_PASSWORD" ]; then
-    echo "HARBOR_USERNAME or HARBOR_PASSWORD is not set in the .env file"
+    echo "Error: HARBOR_USERNAME or HARBOR_PASSWORD is not set in the .env file"
     exit 1
 fi
 
-# Default Variables
-HARBOR_URL="harbor.arpansahu.me/library"
-LOCAL_IMAGE="borcelle_crm"
-TAG="latest"
+# Compute derived variables
+PROJECT_NAME_WITH_DASH=$(echo "$ENV_PROJECT_NAME" | tr '_' '-')
+
+# Default Variables - now using environment variables from .env
+HARBOR_URL="${HARBOR_URL:-$DOCKER_REGISTRY/$DOCKER_REPOSITORY}"
+LOCAL_IMAGE="${DOCKER_IMAGE_NAME}"
+TAG="${DOCKER_IMAGE_TAG}"
 NAMESPACE="default"
-SECRET_NAME="borcelle-crm-secret"
+SECRET_NAME="${PROJECT_NAME_WITH_DASH}-secret"
 ENV_FILE=".env"
 SERVICE_FILE="service.yaml"
 
@@ -80,16 +91,28 @@ function verify_rollout {
 
 # Function to set default specific variables
 function set_default_variables {
-    IMAGE_NAME="borcelle_crm"
-    KUBE_DEPLOYMENT="borcelle-crm-app"
+    IMAGE_NAME="${DOCKER_IMAGE_NAME}"
+    KUBE_DEPLOYMENT="${PROJECT_NAME_WITH_DASH}-app"
     DEPLOYMENT_FILE="deployment.yaml"
+    
+    echo "=== Default Configuration ==="
+    echo "Image: ${HARBOR_URL}/${IMAGE_NAME}:${TAG}"
+    echo "Deployment: ${KUBE_DEPLOYMENT}"
+    echo "Deployment File: ${DEPLOYMENT_FILE}"
+    echo "============================"
 }
 
 # Function to set mac specific variables
 function set_mac_variables {
-    IMAGE_NAME="borcelle_crm_mac"
-    KUBE_DEPLOYMENT="borcelle-crm-mac-app"
+    IMAGE_NAME="${DOCKER_IMAGE_NAME}_mac"
+    KUBE_DEPLOYMENT="${PROJECT_NAME_WITH_DASH}-mac-app"
     DEPLOYMENT_FILE="deployment-mac.yaml"
+    
+    echo "=== Mac Configuration ==="
+    echo "Image: ${HARBOR_URL}/${IMAGE_NAME}:${TAG}"
+    echo "Deployment: ${KUBE_DEPLOYMENT}"
+    echo "Deployment File: ${DEPLOYMENT_FILE}"
+    echo "========================"
 }
 
 # Main script execution
