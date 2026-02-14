@@ -1,7 +1,7 @@
 # check_service_health/management/commands/test_storage.py
 
 from django.core.management.base import BaseCommand
-from django.core.files.storage import default_storage, storages
+from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
 import uuid

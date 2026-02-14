@@ -226,12 +226,12 @@ else:
                     "Messages":[
                             {
                                     "From": {
-                                            "Email": "\$MAIL_JET_EMAIL_ADDRESS",
+                                            "Email": "${env.MAIL_JET_EMAIL_ADDRESS}",
                                             "Name": "ArpanSahuOne Jenkins Notification"
                                     },
                                     "To": [
                                             {
-                                                    "Email": "\$MY_EMAIL_ADDRESS",
+                                                    "Email": "${env.MY_EMAIL_ADDRESS}",
                                                     "Name": "Development Team"
                                             }
                                     ],
@@ -255,12 +255,12 @@ else:
                     "Messages":[
                             {
                                     "From": {
-                                            "Email": "\$MAIL_JET_EMAIL_ADDRESS",
+                                            "Email": "${env.MAIL_JET_EMAIL_ADDRESS}",
                                             "Name": "ArpanSahuOne Jenkins Notification"
                                     },
                                     "To": [
                                             {
-                                                    "Email": "\$MY_EMAIL_ADDRESS",
+                                                    "Email": "${env.MY_EMAIL_ADDRESS}",
                                                     "Name": "Development Team"
                                             }
                                     ],

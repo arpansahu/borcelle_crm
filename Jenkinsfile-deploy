@@ -446,19 +446,19 @@ pipeline {
                 if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
                     sh """curl -s \
                     -X POST \
-                    --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
+                    --user \$MAIL_JET_API_KEY:\$MAIL_JET_API_SECRET \
                     https://api.mailjet.com/v3.1/send \
                     -H "Content-Type:application/json" \
                     -d '{
                         "Messages":[
                                 {
                                         "From": {
-                                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                                "Email": "${env.MAIL_JET_EMAIL_ADDRESS}",
                                                 "Name": "ArpanSahuOne Jenkins Notification"
                                         },
                                         "To": [
                                                 {
-                                                        "Email": "$MY_EMAIL_ADDRESS",
+                                                        "Email": "${env.MY_EMAIL_ADDRESS}",
                                                         "Name": "Development Team"
                                                 }
                                         ],
@@ -485,19 +485,19 @@ pipeline {
         failure {
             sh """curl -s \
             -X POST \
-            --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
+            --user \$MAIL_JET_API_KEY:\$MAIL_JET_API_SECRET \
             https://api.mailjet.com/v3.1/send \
             -H "Content-Type:application/json" \
             -d '{
                 "Messages":[
                         {
                                 "From": {
-                                        "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                        "Email": "${env.MAIL_JET_EMAIL_ADDRESS}",
                                         "Name": "ArpanSahuOne Jenkins Notification"
                                 },
                                 "To": [
                                         {
-                                                "Email": "$MY_EMAIL_ADDRESS",
+                                                "Email": "${env.MY_EMAIL_ADDRESS}",
                                                 "Name": "Developer Team"
                                         }
                                 ],
