@@ -2334,14 +2334,14 @@ services:
     build:  # This section will be used when running locally
       context: .
       dockerfile: Dockerfile
-    image: harbor.arpansahu.me/library/borcelle_crm:latest
+    image: ${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
     env_file: ./.env
-    container_name: borcelle_crm
+    container_name: ${ENV_PROJECT_NAME}
     # volumes:
     #   - .:/app  # Only for local development, commented out for production deployment
     ports:
-      - "8014:8014"
-      - "8052:8052"
+      - "${DOCKER_PORT}:${DOCKER_PORT}"
+      - "${FLOWER_PORT}:${FLOWER_PORT}"
     restart: unless-stopped
 ```
 
@@ -10872,6 +10872,27 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 To run this project, you will need to add the following environment variables to your .env file
 
+# ============================================
+# Docker Registry Configuration
+# ============================================
+DOCKER_REGISTRY=harbor.arpansahu.space
+DOCKER_REPOSITORY=library
+DOCKER_IMAGE_NAME=borcelle_crm
+DOCKER_IMAGE_TAG=latest
+
+# ============================================
+# Deployment Configuration
+# ============================================
+ENV_PROJECT_NAME=borcelle_crm
+SERVER_NAME=borcelle.arpansahu.space
+FLOWER_SERVER_NAME=flower-borcelle.arpansahu.space
+DOCKER_PORT=8014
+FLOWER_PORT=8052
+JENKINS_DOMAIN=jenkins.arpansahu.space
+
+# ============================================
+# Django Configuration
+# ============================================
 SECRET_KEY=
 
 DEBUG=
@@ -10880,12 +10901,20 @@ USE_S3=
 
 ALLOWED_HOSTS=
 
+# ============================================
+# Email Configuration (Mailjet)
+# ============================================
 MAIL_JET_API_KEY=
 
 MAIL_JET_API_SECRET=
 
 MAIL_JET_EMAIL_ADDRESS=
 
+MY_EMAIL_ADDRESS=
+
+# ============================================
+# Object Storage (AWS S3/MinIO)
+# ============================================
 AWS_ACCESS_KEY_ID=
 
 AWS_SECRET_ACCESS_KEY=
@@ -10898,29 +10927,47 @@ DOMAIN=
 
 PROTOCOL=
 
+# ============================================
+# Database Configuration
+# ============================================
 DATABASE_URL=
 
+# ============================================
+# Redis Configuration
+# ============================================
 REDIS_CLOUD_URL=
 
-# SENTRY
+# ============================================
+# Error Tracking (Sentry)
+# ============================================
 SENTRY_ENVIRONMENT=
 
 SENTRY_DSH_URL=
 
-# deploy_kube.sh requirements
+SENTRY_ORG=arpansahu
+
+SENTRY_PROJECT=borcelle_crm
+
+SENTRY_AUTH_TOKEN=
+
+# ============================================
+# Harbor Docker Registry (Legacy - for deploy_kube.sh)
+# ============================================
 HARBOR_USERNAME=
 
 HARBOR_PASSWORD=
 
-HARBOR_URL=
+HARBOR_URL=harbor.arpansahu.me/library
 
-MY_EMAIL_ADDRESS=
-
-# Flower Basic Auth
+# ============================================
+# Flower Monitoring Basic Auth
+# ============================================
 FLOWER_ADMIN_USERNAME=
 FLOWER_ADMIN_PASS=
 
+# ============================================
 # RabbitMQ Configuration
+# ============================================
 RABBITMQ_HOST=
 RABBITMQ_PORT=
 RABBITMQ_USER=
@@ -10928,7 +10975,9 @@ RABBITMQ_PASSWORD=
 RABBITMQ_VHOST=
 RABBITMQ_MANAGEMENT_PORT=
 
-# Kafka Configuration  
+# ============================================
+# Kafka Configuration
+# ============================================
 KAFKA_BOOTSTRAP_SERVERS=
 KAFKA_SECURITY_PROTOCOL=
 KAFKA_SASL_MECHANISM=
@@ -10937,7 +10986,9 @@ KAFKA_SASL_PASSWORD=
 KAFKA_SSL_TRUSTSTORE_PASSWORD=
 KAFKA_SSL_KEYSTORE_PASSWORD=
 
+# ============================================
 # Elasticsearch Configuration
+# ============================================
 ELASTICSEARCH_HOST=
 ELASTICSEARCH_USER=
 ELASTICSEARCH_PASSWORD=
