@@ -116,6 +116,9 @@ pipeline {
                                 pip install -q pytest pytest-django pytest-playwright pytest-asyncio
                                 playwright install chromium
                                 
+                                # Set test server URL for UI tests
+                                export TEST_SERVER_URL="http://127.0.0.1:8014"
+                                
                                 # Start Django server in background
                                 python manage.py runserver 0.0.0.0:8014 &
                                 SERVER_PID=\$!

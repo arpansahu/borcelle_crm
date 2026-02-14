@@ -7,10 +7,11 @@ Tests run against a Django server that should be already running
 import pytest
 from playwright.sync_api import Page, expect
 import time
+import os
 
 
 # Configuration
-BASE_URL = "http://127.0.0.1:8000"  # Django test server
+BASE_URL = os.getenv("TEST_SERVER_URL", "http://127.0.0.1:8000")  # Django test server
 TEST_USER_EMAIL = "testuser@example.com"
 TEST_USER_USERNAME = "testuser"
 TEST_USER_PASSWORD = "TestPass123!"
