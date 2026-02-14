@@ -126,7 +126,8 @@ TEMPLATES = [
 
 # Parse database configuration from $DATABASE_URL
 # Use SQLite for tests, PostgreSQL for production
-if 'test' in sys.argv:
+# Detect both 'python manage.py test' and 'pytest' commands
+if 'test' in sys.argv or 'pytest' in sys.argv[0] if sys.argv else False:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
