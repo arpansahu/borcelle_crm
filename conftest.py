@@ -1,18 +1,6 @@
 import pytest
-import os
 from django.contrib.auth import get_user_model
 from account.models import Account
-from django.conf import settings
-
-# Override database settings for tests to use SQLite in-memory
-# This avoids PostgreSQL schema issues and makes tests much faster
-def pytest_configure(config):
-    settings.DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',
-        }
-    }
 
 User = get_user_model()
 

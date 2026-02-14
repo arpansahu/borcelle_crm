@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import sys
 import subprocess
 from decouple import config
 import dj_database_url
@@ -124,7 +125,16 @@ TEMPLATES = [
 # }
 
 # Parse database configuration from $DATABASE_URL
-DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
+# Use SQLite for tests, PostgreSQL for production
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
+else:
+    DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
