@@ -199,9 +199,11 @@ LOGIN_REDIRECT_URL = "/"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+# Always set STATIC_ROOT - required by collectstatic even when using S3
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 if not USE_S3:
     STATIC_URL = '/static/'
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     MEDIA_URL = '/media/'
 else:
     AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='eu-north-1')
