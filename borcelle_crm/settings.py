@@ -30,9 +30,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # ============================ENV VARIABLES=====================================
 SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', cast=bool, default=False)
+DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(' ')
-
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
@@ -40,19 +39,38 @@ BUCKET_TYPE = config('BUCKET_TYPE')
 
 DATABASE_URL = config('DATABASE_URL')
 REDIS_CLOUD_URL = config('REDIS_CLOUD_URL')
-RABBIT_MQ_URL = config('RABBIT_MQ_URL')
 
 MAIL_JET_API_KEY = config('MAIL_JET_API_KEY')
 MAIL_JET_API_SECRET = config('MAIL_JET_API_SECRET')
 MAIL_JET_EMAIL_ADDRESS = config('MAIL_JET_EMAIL_ADDRESS')
 
-DOMAIN = config('DOMAIN')
-PROTOCOL = config('PROTOCOL')
+# Domain and Protocol Configuration
+if DEBUG:
+    DOMAIN = config('DOMAIN', default='localhost:8014')
+    PROTOCOL = config('PROTOCOL', default='http')
+else:
+    DOMAIN = config('DOMAIN')
+    PROTOCOL = config('PROTOCOL')
 
 SENTRY_ENVIRONMENT = config('SENTRY_ENVIRONMENT')  # production Or "staging", "development", etc.
 SENTRY_DSH_URL = config('SENTRY_DSH_URL')
 
+# RabbitMQ Configuration
+RABBITMQ_HOST = config('RABBITMQ_HOST', default='localhost')
+RABBITMQ_PORT = config('RABBITMQ_PORT', cast=int, default=5672)
+RABBITMQ_USER = config('RABBITMQ_USER', default='guest')
+RABBITMQ_PASSWORD = config('RABBITMQ_PASSWORD', default='guest')
+RABBITMQ_VHOST = config('RABBITMQ_VHOST', default='/')
+RABBITMQ_MANAGEMENT_PORT = config('RABBITMQ_MANAGEMENT_PORT', cast=int, default=15672)
+RABBIT_MQ_URL = config('RABBIT_MQ_URL', default=f'amqp://{RABBITMQ_USER}:{RABBITMQ_PASSWORD}@{RABBITMQ_HOST}:{RABBITMQ_PORT}/{RABBITMQ_VHOST}')
+
+# Harbor Configuration
+HARBOR_URL = config('HARBOR_URL', default='https://harbor.arpansahu.space')
+HARBOR_USERNAME = config('HARBOR_USERNAME', default='admin')
+HARBOR_PASSWORD = config('HARBOR_PASSWORD', default='')
+
 PROJECT_NAME = 'borcelle_crm'
+USE_S3 = config('USE_S3', default=True, cast=bool)
 # ===============================================================================
 
 # Application definition
@@ -181,7 +199,11 @@ LOGIN_REDIRECT_URL = "/"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-if not DEBUG:
+if not USE_S3:
+    STATIC_URL = '/static/'
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    MEDIA_URL = '/media/'
+else:
     AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='eu-north-1')
     
     # Common S3 settings
@@ -209,10 +231,11 @@ if not DEBUG:
     # Static and Media File Storage Settings
     AWS_STATIC_LOCATION = f'portfolio/{PROJECT_NAME}/static'
     STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Temporary location for collectstatic
     
     AWS_PUBLIC_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/media'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
+    
+    AWS_PROTECTED_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/protected'
     
     AWS_PRIVATE_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/private'
 
@@ -251,14 +274,8 @@ if not DEBUG:
             },
         },
     }
-else:
-    # Static files (CSS, JavaScript, Images)
-    # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-    STATIC_URL = '/static/'
-
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    MEDIA_URL = '/media/'
+# Development settings (for local media/static handling)
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
@@ -409,4 +426,4 @@ LOGGING = {
     },
 }
 
-CSRF_TRUSTED_ORIGINS = [f'{PROTOCOL}{DOMAIN}', f'{PROTOCOL}*.{DOMAIN}']
+CSRF_TRUSTED_ORIGINS = [f'{PROTOCOL}://{DOMAIN}', f'{PROTOCOL}://*.{DOMAIN}']
