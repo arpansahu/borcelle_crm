@@ -10844,7 +10844,7 @@ pipeline {
 
 Note: agent {label 'local'} is used to specify which node will execute the jenkins job deployment. So local linux server is labelled with 'local' are the project with this label will be executed in local machine node.
 
-* Configure a Jenkins project from jenkins ui located at https://jenkins.arpansahu.space
+* Configure a Jenkins project from jenkins ui located at https://jenkins.arpansahu.me
 
 Make sure to use Pipeline project and name it whatever you want I have named it as per great_chat
 
@@ -10931,8 +10931,8 @@ DOCKER_IMAGE_TAG=latest
 ENV_PROJECT_NAME=borcelle_crm
 SERVER_NAME=borcelle.arpansahu.space
 FLOWER_SERVER_NAME=flower-borcelle.arpansahu.space
-DOCKER_PORT=8014
-FLOWER_PORT=8052
+DOCKER_PORT=8016
+FLOWER_PORT=8054
 JENKINS_DOMAIN=jenkins.arpansahu.space
 
 # ============================================
@@ -10944,6 +10944,11 @@ DEBUG=
 
 USE_S3=
 
+# ALLOWED_HOSTS supports:
+# - Domain names: borcelle.arpansahu.space
+# - Wildcards: .arpansahu.space (all subdomains)
+# - IP addresses: 127.0.0.1, 192.168.1.200
+# - CIDR subnets: 10.42.0.0/16 (Kubernetes pod network)
 ALLOWED_HOSTS=
 
 # ============================================
@@ -10958,7 +10963,11 @@ MAIL_JET_EMAIL_ADDRESS=
 MY_EMAIL_ADDRESS=
 
 # ============================================
-# Object Storage (AWS S3/MinIO)
+# Object Storage (MinIO)
+# ============================================
+# Using MinIO for object storage through nginx proxy
+# API Endpoint: minioapi.arpansahu.space (nginx proxy to MinIO API)
+# Console UI: minio.arpansahu.space (MinIO web console)
 # ============================================
 AWS_ACCESS_KEY_ID=
 
@@ -10966,8 +10975,20 @@ AWS_SECRET_ACCESS_KEY=
 
 AWS_STORAGE_BUCKET_NAME=
 
+# MinIO API endpoint (used by boto3/django-storages)
+AWS_S3_ENDPOINT_URL=https://minioapi.arpansahu.space
+
+# Custom domain for serving files (calculated: endpoint/bucket)
+AWS_S3_CUSTOM_DOMAIN=minioapi.arpansahu.space/arpansahu-one-bucket
+
 BUCKET_TYPE=
 
+# ============================================
+# Django Configuration (continued)
+# ============================================
+# Domain and Protocol Configuration
+# For LOCAL: DOMAIN=localhost:8016 and PROTOCOL=http
+# For PRODUCTION: DOMAIN=yourdomain.com and PROTOCOL=https
 DOMAIN=
 
 PROTOCOL=
@@ -11011,33 +11032,15 @@ FLOWER_ADMIN_USERNAME=
 FLOWER_ADMIN_PASS=
 
 # ============================================
-# RabbitMQ Configuration
+# RabbitMQ Configuration (Used by Celery)
 # ============================================
 RABBITMQ_HOST=
-RABBITMQ_PORT=
+RABBITMQ_PORT=5672
 RABBITMQ_USER=
 RABBITMQ_PASSWORD=
-RABBITMQ_VHOST=
-RABBITMQ_MANAGEMENT_PORT=
-
-# ============================================
-# Kafka Configuration
-# ============================================
-KAFKA_BOOTSTRAP_SERVERS=
-KAFKA_SECURITY_PROTOCOL=
-KAFKA_SASL_MECHANISM=
-KAFKA_SASL_USERNAME=
-KAFKA_SASL_PASSWORD=
-KAFKA_SSL_TRUSTSTORE_PASSWORD=
-KAFKA_SSL_KEYSTORE_PASSWORD=
-
-# ============================================
-# Elasticsearch Configuration
-# ============================================
-ELASTICSEARCH_HOST=
-ELASTICSEARCH_USER=
-ELASTICSEARCH_PASSWORD=
-ELASTICSEARCH_INDEX_PREFIX=
+RABBITMQ_VHOST=/
+RABBITMQ_MANAGEMENT_PORT=15672
+RABBIT_MQ_URL=
 
 # ==================== Social Authentication (OAuth) ====================
 # Google OAuth - https://console.developers.google.com/
