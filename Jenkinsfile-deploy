@@ -300,11 +300,6 @@ pipeline {
                             // Print current directory
                             sh 'pwd'
                             
-                            // Delete existing secret if it exists
-                            sh """
-                            kubectl delete secret ${PROJECT_NAME_WITH_DASH}-secret || true
-                            """
-
                             // Delete the existing service and deployment
                             sh """
                             kubectl delete service ${PROJECT_NAME_WITH_DASH}-service || true
@@ -312,9 +307,15 @@ pipeline {
                             kubectl delete deployment ${PROJECT_NAME_WITH_DASH}-app || true
                             """
 
+                            // Create or update secret using apply pattern (handles both create and update)
+                            sh """
+                            kubectl create secret generic ${PROJECT_NAME_WITH_DASH}-secret \
+                                --from-env-file=${WORKSPACE}/.env \
+                                --dry-run=client -o yaml | kubectl apply -f -
+                            """
+
                             // Deploy to Kubernetes
                             sh """
-                            kubectl create secret generic ${PROJECT_NAME_WITH_DASH}-secret --from-env-file=${WORKSPACE}/.env
                             kubectl apply -f ${WORKSPACE}/service.yaml
                             kubectl apply -f ${WORKSPACE}/deployment.yaml
                             """
