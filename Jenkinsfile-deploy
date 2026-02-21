@@ -26,6 +26,9 @@ pipeline {
                 script {
                     echo "Loading environment variables from Jenkins credentials..."
                     withCredentials([file(credentialsId: 'borcelle_crm_env_file', variable: 'ENV_FILE')]) {
+                        // Remove existing .env file if it exists (handles read-only files)
+                        sh 'rm -f .env || true'
+                        
                         // Use Jenkins API instead of shell commands to avoid permission issues
                         def envContent = readFile(file: env.ENV_FILE)
                         writeFile(file: '.env', text: envContent)
