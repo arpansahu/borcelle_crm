@@ -26,9 +26,6 @@ pipeline {
                 script {
                     echo "Loading environment variables from Jenkins credentials..."
                     withCredentials([file(credentialsId: 'borcelle_crm_env_file', variable: 'ENV_FILE')]) {
-                        // Remove existing .env file if it exists (handles read-only files)
-                        sh 'rm -f .env || true'
-                        
                         // Use Jenkins API instead of shell commands to avoid permission issues
                         def envContent = readFile(file: env.ENV_FILE)
                         writeFile(file: '.env', text: envContent)
@@ -88,47 +85,55 @@ pipeline {
                 }
             }
         }
-        stage('Update Nginx Configuration') {
+        stage('Check & Create Nginx Configuration') {
             steps {
                 script {
-                    echo "Updating Nginx configuration from repository..."
+                    // Check if the Nginx configuration file exists
+                    def configExists = sh(script: "test -f ${NGINX_CONF} && echo 'exists' || echo 'not exists'", returnStdout: true).trim()
 
-                    // Always update the config to ensure it matches the repository version
-                    sh "sudo cat nginx.conf | sudo tee ${NGINX_CONF} > /dev/null"
+                    if (configExists == 'not exists') {
+                        echo "Nginx configuration file does not exist. Creating it now..."
 
-                    // Replace placeholders in the configuration file
-                    sh "sudo sed -i 's|SERVER_NAME|${SERVER_NAME}|g' ${NGINX_CONF}"
-                    sh "sudo sed -i 's|DOCKER_PORT|${DOCKER_PORT}|g' ${NGINX_CONF}"
+                        // Create or overwrite the NGINX_CONF file with the content of nginx.conf using sudo tee
+                        sh "sudo cat nginx.conf | sudo tee ${NGINX_CONF} > /dev/null"
 
-                    echo "✅ Nginx configuration updated successfully"
+                        // Replace placeholders in the configuration file
+                        sh "sudo sed -i 's|SERVER_NAME|${SERVER_NAME}|g' ${NGINX_CONF}"
+                        sh "sudo sed -i 's|DOCKER_PORT|${DOCKER_PORT}|g' ${NGINX_CONF}"
 
-                    // Ensure Nginx is aware of the configuration
-                    sh "sudo ln -sf ${NGINX_CONF} /etc/nginx/sites-enabled/"
-                    
-                    // Test nginx configuration
-                    sh "sudo nginx -t"
+                        echo "Nginx configuration file created."
+
+                        // Ensure Nginx is aware of the new configuration
+                        sh "sudo ln -sf ${NGINX_CONF} /etc/nginx/sites-enabled/"
+                    } else {
+                        echo "Nginx configuration file already exists."
+                    }                    
                 }
             }
         }
-        stage('Update Flower Nginx Configuration') {
+        stage('Check & Create Flower Nginx Configuration') {
             steps {
                 script {
-                    echo "Updating Flower Nginx configuration from repository..."
+                    // Check if the Nginx configuration file exists
+                    def configExists = sh(script: "test -f ${NGINX_CONF_FLOWER} && echo 'exists' || echo 'not exists'", returnStdout: true).trim()
 
-                    // Always update the config to ensure it matches the repository version
-                    sh "sudo cat nginx-flower.conf | sudo tee ${NGINX_CONF_FLOWER} > /dev/null"
+                    if (configExists == 'not exists') {
+                        echo "Nginx configuration file does not exist. Creating it now..."
 
-                    // Replace placeholders in the configuration file
-                    sh "sudo sed -i 's|SERVER_NAME|${FLOWER_SERVER_NAME}|g' ${NGINX_CONF_FLOWER}"
-                    sh "sudo sed -i 's|DOCKER_PORT|${FLOWER_PORT}|g' ${NGINX_CONF_FLOWER}"
+                        // Create or overwrite the NGINX_CONF_FLOWER file with the content of nginx-flower.conf using sudo tee
+                        sh "sudo cat nginx-flower.conf | sudo tee ${NGINX_CONF_FLOWER} > /dev/null"
 
-                    echo "✅ Flower Nginx configuration updated successfully"
+                        // Replace placeholders in the configuration file
+                        sh "sudo sed -i 's|SERVER_NAME|${FLOWER_SERVER_NAME}|g' ${NGINX_CONF_FLOWER}"
+                        sh "sudo sed -i 's|DOCKER_PORT|${FLOWER_PORT}|g' ${NGINX_CONF_FLOWER}"
 
-                    // Ensure Nginx is aware of the configuration
-                    sh "sudo ln -sf ${NGINX_CONF_FLOWER} /etc/nginx/sites-enabled/"
-                    
-                    // Test nginx configuration
-                    sh "sudo nginx -t"
+                        echo "Nginx configuration file created."
+
+                        // Ensure Nginx is aware of the new configuration
+                        sh "sudo ln -sf ${NGINX_CONF_FLOWER} /etc/nginx/sites-enabled/"
+                    } else {
+                        echo "Nginx configuration file already exists."
+                    }                    
                 }
             }
         }

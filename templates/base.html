@@ -28,7 +28,10 @@
   <!-- Specific CSS goes HERE -->
   <!-- Autocomplete CSS is embedded in the library -->
   
+  <!-- Load Sentry only in production (not during tests) -->
+  {% if not debug and not testing %}
   <script src="https://js.sentry-cdn.com/fb1d2388910b0cd4d52743572aae86fa.min.js" crossorigin="anonymous"></script>
+  {% endif %}
   {% block stylesheets %}
   <style>
     html {

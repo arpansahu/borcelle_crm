@@ -27,19 +27,28 @@ def browser_context_args(browser_context_args):
     }
 
 
+# Configure default navigation timeout and wait strategy
+@pytest.fixture(scope="module")
+def browser_context(browser_context):
+    """Set default navigation options"""
+    browser_context.set_default_navigation_timeout(45000)  # 45 seconds
+    return browser_context
+
+
 class TestPublicPages:
     """Test public pages that don't require authentication"""
     
     def test_homepage_redirects_to_login(self, page: Page):
         """Test that the homepage redirects to login when not authenticated"""
-        page.goto(BASE_URL)
+        # Use domcontentloaded instead of load - don't wait for all external resources
+        page.goto(BASE_URL, wait_until="domcontentloaded")
         # Should redirect to login page
         page.wait_for_url(f"{BASE_URL}/login/*", timeout=10000)
         expect(page).to_have_title("Sign IN")
         
     def test_login_page_loads(self, page: Page):
         """Test that the login page loads and has correct elements"""
-        page.goto(f"{BASE_URL}/login/")
+        page.goto(f"{BASE_URL}/login/", wait_until="domcontentloaded")
         expect(page).to_have_title("Sign IN")
         
         # Check for login form elements
@@ -49,7 +58,7 @@ class TestPublicPages:
     
     def test_register_page_loads(self, page: Page):
         """Test that the registration page loads"""
-        page.goto(f"{BASE_URL}/register/")
+        page.goto(f"{BASE_URL}/register/", wait_until="domcontentloaded")
         expect(page).to_have_title("Sign UP")
         
         # Check for registration form (uses password1 and password2 from UserCreationForm)
@@ -63,7 +72,7 @@ class TestAuthentication:
     
     def test_login_with_valid_credentials(self, page: Page):
         """Test logging in with valid credentials"""
-        page.goto(f"{BASE_URL}/login/")
+        page.goto(f"{BASE_URL}/login/", wait_until="domcontentloaded")
         
         # Form field is 'username' but expects email value
         page.fill('input[name="username"]', TEST_USER_EMAIL)
@@ -75,7 +84,7 @@ class TestAuthentication:
         
     def test_login_with_invalid_credentials(self, page: Page):
         """Test logging in with invalid credentials"""
-        page.goto(f"{BASE_URL}/login/")
+        page.goto(f"{BASE_URL}/login/", wait_until="domcontentloaded")
         
         page.fill('input[name="username"]', "wronguser")
         page.fill('input[name="password"]', "wrongpassword")
@@ -92,7 +101,7 @@ class TestAuthenticatedPages:
     @pytest.fixture(autouse=True)
     def login(self, page: Page):
         """Login before each test in this class"""
-        page.goto(f"{BASE_URL}/login/")
+        page.goto(f"{BASE_URL}/login/", wait_until="domcontentloaded")
         # Form field is 'username' but expects email value
         page.fill('input[name="username"]', TEST_USER_EMAIL)
         page.fill('input[name="password"]', TEST_USER_PASSWORD)
@@ -101,20 +110,20 @@ class TestAuthenticatedPages:
     
     def test_dashboard_loads(self, page: Page):
         """Test that dashboard loads after login"""
-        page.goto(f"{BASE_URL}/")
+        page.goto(f"{BASE_URL}/", wait_until="domcontentloaded")
         # Check for dashboard elements
         assert "Borcelle CRM" in page.title()
     
     def test_contacts_page_loads(self, page: Page):
         """Test contacts page redirects to home (ContactsView redirects)"""
-        page.goto(f"{BASE_URL}/contact/")
+        page.goto(f"{BASE_URL}/contact/", wait_until="domcontentloaded")
         # ContactsView redirects to home
         page.wait_for_url(f"{BASE_URL}/", timeout=10000)
         expect(page).to_have_url(f"{BASE_URL}/")
     
     def test_add_contact_page_loads(self, page: Page):
         """Test add contact page loads"""
-        page.goto(f"{BASE_URL}/contact/add/")
+        page.goto(f"{BASE_URL}/contact/add/", wait_until="domcontentloaded")
         
         # Check for form fields
         expect(page.locator('input[name="name"]')).to_be_visible()
@@ -122,16 +131,16 @@ class TestAuthenticatedPages:
     
     def test_account_page_loads(self, page: Page):
         """Test account page loads"""
-        page.goto(f"{BASE_URL}/account/")
+        page.goto(f"{BASE_URL}/account/", wait_until="domcontentloaded")
         expect(page).to_have_url(f"{BASE_URL}/account/")
     
     def test_logout(self, page: Page):
         """Test logout functionality"""
-        page.goto(f"{BASE_URL}/logout/")
+        page.goto(f"{BASE_URL}/logout/", wait_until="domcontentloaded")
         time.sleep(1)
         
         # Should redirect to login page
-        page.goto(f"{BASE_URL}/")
+        page.goto(f"{BASE_URL}/", wait_until="domcontentloaded")
         page.wait_for_url(f"{BASE_URL}/login/*", timeout=10000)
 
 
@@ -141,7 +150,7 @@ class TestResponsiveness:
     def test_mobile_viewport(self, page: Page):
         """Test site on mobile viewport"""
         page.set_viewport_size({"width": 375, "height": 667})
-        page.goto(f"{BASE_URL}/login/")
+        page.goto(f"{BASE_URL}/login/", wait_until="domcontentloaded")
         
         # Check if page renders correctly
         expect(page.locator('input[name="username"]')).to_be_visible()

@@ -24,9 +24,6 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'borcelle_crm_env_file', variable: 'ENV_FILE')]) {
-                        // Remove existing .env file if it exists (handles read-only files)
-                        sh 'rm -f .env || true'
-                        
                         // Use Jenkins API instead of shell commands to avoid permission issues
                         def envContent = readFile(file: env.ENV_FILE)
                         writeFile(file: '.env', text: envContent)
@@ -119,8 +116,9 @@ pipeline {
                                 pip install -q pytest pytest-django pytest-playwright pytest-asyncio
                                 playwright install chromium
                                 
-                                # Set test server URL for UI tests
+                                # Set test server URL and testing flag for UI tests
                                 export TEST_SERVER_URL="http://127.0.0.1:8014"
+                                export TESTING=1
                                 
                                 # Start Django server in background
                                 python manage.py runserver 0.0.0.0:8014 &
