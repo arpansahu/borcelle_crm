@@ -14,7 +14,9 @@
   <script src="{% static 'celery_progress/websockets.js' %}"></script>
 
   <!-- Github buttons -->
+  {% if not testing %}
   <script async defer src="https://buttons.github.io/buttons.js"></script>
+  {% endif %}
 
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="{% static 'assets/js/soft-ui-dashboard.min.js' %}"></script>
