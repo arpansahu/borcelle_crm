@@ -43,7 +43,7 @@ class TestPublicPages:
         # Use domcontentloaded instead of load - don't wait for all external resources
         page.goto(BASE_URL, wait_until="domcontentloaded")
         # Should redirect to login page
-        page.wait_for_url(f"{BASE_URL}/login/*", timeout=10000)
+        page.wait_for_url(f"{BASE_URL}/login/*")
         expect(page).to_have_title("Sign IN")
         
     def test_login_page_loads(self, page: Page):
@@ -80,7 +80,7 @@ class TestAuthentication:
         page.click('button[type="submit"]')
         
         # Wait for redirect and check if logged in
-        page.wait_for_url(f"{BASE_URL}/", timeout=10000)
+        page.wait_for_url(f"{BASE_URL}/")
         
     def test_login_with_invalid_credentials(self, page: Page):
         """Test logging in with invalid credentials"""
@@ -106,7 +106,7 @@ class TestAuthenticatedPages:
         page.fill('input[name="username"]', TEST_USER_EMAIL)
         page.fill('input[name="password"]', TEST_USER_PASSWORD)
         page.click('button[type="submit"]')
-        page.wait_for_url(f"{BASE_URL}/", timeout=10000)
+        page.wait_for_url(f"{BASE_URL}/")
     
     def test_dashboard_loads(self, page: Page):
         """Test that dashboard loads after login"""
@@ -118,7 +118,7 @@ class TestAuthenticatedPages:
         """Test contacts page redirects to home (ContactsView redirects)"""
         page.goto(f"{BASE_URL}/contact/", wait_until="domcontentloaded")
         # ContactsView redirects to home
-        page.wait_for_url(f"{BASE_URL}/", timeout=10000)
+        page.wait_for_url(f"{BASE_URL}/")
         expect(page).to_have_url(f"{BASE_URL}/")
     
     def test_add_contact_page_loads(self, page: Page):
@@ -141,7 +141,7 @@ class TestAuthenticatedPages:
         
         # Should redirect to login page
         page.goto(f"{BASE_URL}/", wait_until="domcontentloaded")
-        page.wait_for_url(f"{BASE_URL}/login/*", timeout=10000)
+        page.wait_for_url(f"{BASE_URL}/login/*")
 
 
 class TestResponsiveness:
