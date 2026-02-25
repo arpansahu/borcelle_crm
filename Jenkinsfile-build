@@ -82,7 +82,7 @@ pipeline {
                         --env-file .env \
                         python:3.10.7 \
                         bash -c 'pip install -q -r requirements.txt && \
-                                 pip install -q pytest pytest-django pytest-asyncio channels pytest-cov && \
+                                 pip install -q pytest pytest-django pytest-asyncio channels pytest-cov playwright && \
                                  pytest --ignore=check_service_health/test_ui.py -v --tb=short'
                     """
                     
