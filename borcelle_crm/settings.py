@@ -243,11 +243,7 @@ else:
     
     AWS_PRIVATE_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/private'
 
-    # Django 3.2 compatible storage backends (required for Django < 4.2)
-    STATICFILES_STORAGE = f'{PROJECT_NAME}.storage_backends.StaticStorage'
-    DEFAULT_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PublicMediaStorage'
-    
-    # Use your custom storage classes with modern STORAGES dict (for Django 4.2+)
+    # Use your custom storage classes with modern STORAGES dict (Django 4.2+ only)
     STORAGES = {
         'default': {
             'BACKEND': f'{PROJECT_NAME}.storage_backends.PublicMediaStorage',
